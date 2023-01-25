@@ -36,16 +36,26 @@ Please note that this is just an example, and it is important to consult with a 
 To install your package, you can use the pip package manager by running the following command in your command line:
 
 ```python
-pip install your_package_name
+pip install generateApiKey
 ```
 
 # Importing the package
 Once the package is installed, you can import the package in your code by using the import statement:
 ```python
-from your_package_name import generateApiKey
+from generateApiKey import generateApiKey
 ```
 # Generating an API key
 To generate an API key, you can use the generateApiKey() function and pass in the secret, seed, and an optional include keyword. For example:
+
+```python
+from generateApiKey import generateApiKey
+
+seed='12'
+secret='Topsecrect'
+api_key=generateApiKey(secret,seed)
+print(api_key)
+```
+
 
 ```python
 secret = 'mysecret'
