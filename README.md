@@ -1,3 +1,12 @@
+[![Downloads](https://static.pepy.tech/personalized-badge/generateApiKey?period=total&units=abbreviation&left_color=grey&right_color=yellow&left_text=Total-Downloads)](https://pepy.tech/project/generateApiKey)
+[![Supported Versions](https://img.shields.io/pypi/pyversions/generateApiKey.svg)](https://pypi.org/project/YoutubeTags)
+![GitHub](https://img.shields.io/github/license/nuhmanpk/generate-api-key)
+![PyPI](https://img.shields.io/pypi/v/generateApiKey)
+[![Documentation Status](https://readthedocs.org/projects/generateApiKey/badge/?version=latest)](https://generateApiKey.readthedocs.io/en/latest/?badge=latest)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/generateApiKey)
+[![Downloads](https://static.pepy.tech/personalized-badge/generateApiKey?period=week&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/Week)](https://pepy.tech/project/generateApiKey)
+[![Upload to PIP](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml/badge.svg?branch=main&event=workflow_dispatch)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/Pypi-uploads.yml)
+![PyPI - Format](https://img.shields.io/pypi/format/generateApiKey)
 # API Key Generation Package
 
 This package provides a convenient way to generate API keys using a secret, seed, and an optional include keyword. The generated keys are unique and secure, making them suitable for use in a variety of applications.
