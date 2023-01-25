@@ -7,7 +7,7 @@ README = (file / "README.md").read_text()
 
 setuptools.setup(
     name="generateApiKey",
-    version="0.3",
+    version="0.3.1",
     author="Nuhman Pk",
     author_email="nuhmanpk7@gmail.com",
     long_description = README,
@@ -21,6 +21,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=setuptools.find_packages(include=['generateApiKey']),
-    python_requires=">=3.10",
+    python_requires=">=3.9",
     
 )
