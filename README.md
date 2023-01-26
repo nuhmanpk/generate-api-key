@@ -58,10 +58,10 @@ print(api_key)
 
 
 ```python
-secret = 'mysecret'
-seed = 'randomseed'
-api_key = generateApiKey(secret, seed)
+from generateApiKey import generateApiKey
+api_key = generateApiKey(secret='Topsecret', seed='12',include='user1')
 print(api_key)
+
 ```
 
 
@@ -74,7 +74,7 @@ print(api_key)
 ```
 This will generate an API key based on the provided secret, seed, and include keyword.
 
-Error handling
+## Error handling
 It is a good practice to handle errors, you can use the try and except block to handle any exception that may occur during the key generation process.
 
 ```python
@@ -97,3 +97,5 @@ if api_key is None:
 else:
     print(api_key)
 ```
+
+___
