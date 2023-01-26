@@ -97,5 +97,22 @@ if api_key is None:
 else:
     print(api_key)
 ```
+# Parameters 
 
-___
+| **Variable** |	**Type** |	**Required** |	**Example Value** |	Description |
+|----------|---------|-----------|--------------------|-------------|
+| secret |	`String` |	Yes |	"Topsecret" |	The secret key used to generate the API key. It should be kept private and not shared with unauthorized parties. |
+| seed |	`String` |	Yes |	"12" |	A value used to seed the generation of the API key. It can be any value, but it should be unique for each key. |
+| include |	`String` |	Optional |	"user1" |	An optional value that can be included in the generated API key. It can be used to identify the user or application associated with the key. |
+
+
+
+By using this package, you are solely liable for any legal issues that may arise from its unauthorized use or misuse, as well as any security risks that may result from not properly securing the secret key used to generate the API keys.
+
+# Fair Use Policy:
+
+This package is provided as is, without any warranties or guarantees of any kind. We are not liable for any damages or losses that may result from its use. We reserve the right to change or discontinue the package at any time without notice.
+
+We encourage you to use the package responsibly, and to report any security issues or bugs you may encounter.
+
+[Nuhman](https://github.com/nuhmanpk)
