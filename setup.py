@@ -7,7 +7,7 @@ README = (file / "README.md").read_text()
 
 setuptools.setup(
     name="generateApiKey",
-    version="0.3.1",
+    version="0.4.0",
     author="Nuhman Pk",
     author_email="nuhmanpk7@gmail.com",
     long_description = README,
@@ -19,6 +19,9 @@ setuptools.setup(
         "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
+    ],
+    install_requires=[
+        'cryptography'
     ],
     packages=setuptools.find_packages(include=['generateApiKey']),
     python_requires=">=3.9",

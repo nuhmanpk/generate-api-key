@@ -9,6 +9,8 @@
 ![PyPI - Format](https://img.shields.io/pypi/format/generateApiKey)
 # API Key Generation Package
 
+Timestamp and Numeric Representation: Now, the package incorporates a time-based and date-based hashing mechanism, adding an extra layer of security to your API keys. It captures the current timestamp and numeric representation of the key generation process, creating a unique identifier that's closely tied to the moment it was generated. This feature adds an element of time-based uniqueness to your keys, making them even more secure and less predictable.
+
 This package provides a convenient way to generate API keys using a secret, seed, and an optional include keyword. The generated keys are unique and secure, making them suitable for use in a variety of applications.
 
 The package supports generating API keys using a variety of methods such as UUID v5 and SHA-256 algorithm. The keys are generated using a combination of seed, secret, and include keyword. Additionally, the package allows you to insert the include keyword at a random position in the seed which will make it more difficult to guess.
@@ -29,7 +31,6 @@ It is the user's responsibility to ensure the security of the keys and the prote
 
 By using this package, you agree to take all necessary precautions to protect the data and resources accessed with the keys from unauthorized access or misuse.
 
-Please note that this is just an example, and it is important to consult with a legal professional before publishing any package to ensure that it meets all legal and regulatory requirements.
 
 
 # Installation
@@ -61,7 +62,12 @@ print(api_key)
 from generateApiKey import generateApiKey
 api_key = generateApiKey(secret='Topsecret', seed='12',include='user1')
 print(api_key)
+```
 
+```python
+from generateApiKey import generateApiKey
+api_key = generateApiKey(secret='Topsecret', seed='12',include='user1',add_dashes=True)
+print(api_key)
 ```
 
 
@@ -104,7 +110,7 @@ else:
 | secret |	`String` |	Yes |	"Topsecret" |	The secret key used to generate the API key. It should be kept private and not shared with unauthorized parties. |
 | seed |	`String` |	Yes |	"12" |	A value used to seed the generation of the API key. It can be any value, but it should be unique for each key. |
 | include |	`String` |	Optional |	"user1" |	An optional value that can be included in the generated API key. It can be used to identify the user or application associated with the key. |
-
+| add_dashes |	`boolean` |	Optional |	True |	A value used to determine wheather to add dashes or not in a key |
 
 
 By using this package, you are solely liable for any legal issues that may arise from its unauthorized use or misuse, as well as any security risks that may result from not properly securing the secret key used to generate the API keys.
@@ -115,4 +121,4 @@ This package is provided as is, without any warranties or guarantees of any kind
 
 We encourage you to use the package responsibly, and to report any security issues or bugs you may encounter.
 
-[Nuhman](https://github.com/nuhmanpk)
+[Nuhman Pk](https://github.com/nuhmanpk)
