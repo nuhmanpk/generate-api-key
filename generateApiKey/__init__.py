@@ -11,10 +11,11 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
-def generateApiKey(secret, seed, include=None, add_dashes=False, pbkdf2_iterations=10000):
+def generateApiKey(secret, seed, include=None, add_dashes=False):
     try:
         current_timestamp = int(time.time())
         now = datetime.datetime.now()
+        pbkdf2_iterations = random.randint(1000,10000)
         numeric_representation = int(
             f"{now.year}{now.month:02d}{now.day:02d}{now.hour:02d}{now.minute:02d}{now.second:02d}"
         )
