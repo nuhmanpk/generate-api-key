@@ -7,7 +7,7 @@ README = (file / "README.md").read_text()
 
 setuptools.setup(
     name="generateApiKey",
-    version="0.4.5",
+    version="0.4.6",
     author="Nuhman Pk",
     author_email="nuhmanpk7@gmail.com",
     long_description = README,
