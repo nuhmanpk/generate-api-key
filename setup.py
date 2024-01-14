@@ -7,7 +7,7 @@ README = (file / "README.md").read_text()
 
 setuptools.setup(
     name="generateApiKey",
-    version="0.4.6",
+    version="0.4.7",
     author="Nuhman Pk",
     author_email="nuhmanpk7@gmail.com",
     long_description = README,
@@ -25,5 +25,11 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(include=['generateApiKey']),
     python_requires=">=3.9",
+    project_urls={
+        'Documentation': 'https://github.com/nuhmanpk/generate-api-key/blob/main/README.md',
+        'Funding': 'https://github.com/sponsors/nuhmanpk',
+        'Source': 'https://github.com/nuhmanpk/generate-api-key/',
+        'Tracker': 'https://github.com/nuhmanpk/generate-api-key/issues',
+    },
     
 )
