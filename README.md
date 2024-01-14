@@ -53,20 +53,20 @@ from generateApiKey import generateApiKey
 
 seed='12'
 secret='Topsecrect'
-api_key=generateApiKey(secret,seed)
+api_key= await generateApiKey(secret,seed)
 print(api_key)
 ```
 
 
 ```python
 from generateApiKey import generateApiKey
-api_key = generateApiKey(secret='Topsecret', seed='12',include='user1')
+api_key = await generateApiKey(secret='Topsecret', seed='12',include='user1')
 print(api_key)
 ```
 
 ```python
 from generateApiKey import generateApiKey
-api_key = generateApiKey(secret='Topsecret', seed='12',include='user1',add_dashes=True)
+api_key = await generateApiKey(secret='Topsecret', seed='12',include='user1',add_dashes=True)
 print(api_key)
 ```
 
@@ -75,7 +75,7 @@ print(api_key)
 secret = 'mysecret'
 seed = 'randomseed'
 include = "TopSecretWord"
-api_key = generateApiKey(secret, seed, include)
+api_key = await generateApiKey(secret, seed, include)
 print(api_key)
 ```
 This will generate an API key based on the provided secret, seed, and include keyword.
@@ -88,7 +88,7 @@ try:
     secret = 'mysecret'
     seed = 'randomseed'
     include = "Production"
-    api_key = generateApiKey(secret, seed, include)
+    api_key = await generateApiKey(secret, seed, include)
     print(api_key)
 except Exception as e:
     print(e)
@@ -97,7 +97,7 @@ except Exception as e:
 You can use the None return in the package function, to check if the key generation was successful.
 
 ```python
-api_key = generateApiKey(secret, seed, include)
+api_key = await generateApiKey(secret, seed, include)
 if api_key is None:
     print("Failed to generate api key")
 else:
