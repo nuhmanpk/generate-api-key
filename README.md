@@ -2,7 +2,6 @@
 [![Supported Versions](https://img.shields.io/pypi/pyversions/generateApiKey.svg)](https://pypi.org/project/YoutubeTags)
 ![GitHub](https://img.shields.io/github/license/nuhmanpk/generate-api-key)
 ![PyPI](https://img.shields.io/pypi/v/generateApiKey)
-[![Documentation Status](https://readthedocs.org/projects/generateApiKey/badge/?version=latest)](https://generateApiKey.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/generateApiKey)
 [![Downloads](https://static.pepy.tech/personalized-badge/generateApiKey?period=week&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/Week)](https://pepy.tech/project/generateApiKey)
 [![Upload to PIP](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml/badge.svg?branch=main&event=workflow_dispatch)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/Pypi-uploads.yml)
@@ -48,26 +47,40 @@ from generateApiKey import generateApiKey
 # Generating an API key
 To generate an API key, you can use the generateApiKey() function and pass in the secret, seed, and an optional include keyword. For example:
 
+### Without Dashes
+
 ```python
 from generateApiKey import generateApiKey
 
 seed='12'
 secret='Topsecrect'
-api_key= await generateApiKey(secret,seed)
+api_key= await generateApiKey(secret,seed) # KaEQfEOP0ZMXbkgElkuPRv6iUrMxQDytwrQPKhH0eO8
 print(api_key)
 ```
 
 
 ```python
 from generateApiKey import generateApiKey
-api_key = await generateApiKey(secret='Topsecret', seed='12',include='user1')
+api_key = await generateApiKey(secret='Topsecret', seed='12',include='user1') # iFuOcas8lSCw8jKWVIg4ru9WXhfr8erl5YzWc8kQw
 print(api_key)
 ```
+### With Dashes
 
 ```python
 from generateApiKey import generateApiKey
-api_key = await generateApiKey(secret='Topsecret', seed='12',include='user1',add_dashes=True)
+api_key = await generateApiKey(secret='Topsecret', seed='12',
+    include='user1',add_dashes=True) # 1ff0f93f-c14d-5768-b324-626f1099948b
 print(api_key)
+```
+### With prefix
+
+```python
+seed='12'
+secret='Topsecrect'
+api_key=await generateApiKey(secret,seed,
+    prefix='hf',add_dashes=True) # hf-db27e2d7-d0bb-5014-9f75-4c2fda33f727 
+print(api_key)
+
 ```
 
 
@@ -105,12 +118,13 @@ else:
 ```
 # Parameters 
 
-| **Variable** |	**Type** |	**Required** |	**Example Value** |	Description |
-|----------|---------|-----------|--------------------|-------------|
-| secret |	`String` |	Yes |	"Topsecret" |	The secret key used to generate the API key. It should be kept private and not shared with unauthorized parties. |
-| seed |	`String` |	Yes |	"12" |	A value used to seed the generation of the API key. It can be any value, but it should be unique for each key. |
-| include |	`String` |	Optional |	"user1" |	An optional value that can be included in the generated API key. It can be used to identify the user or application associated with the key. |
-| add_dashes |	`boolean` |	Optional |	True |	A value used to determine wheather to add dashes or not in a key |
+| **Variable** |	**Type** |	**Required** |	**Example Value** | **Default** |	**Description** |
+|----------|---------|-----------|--------------------|-------------|-------------------|
+| secret |	`String` |	Yes |	"Topsecret" | - |	The secret key used to generate the API key. It should be kept private and not shared with unauthorized parties. |
+| seed |	`String` |	Yes |	"12" | - |	A value used to seed the generation of the API key. It can be any value, but it should be unique for each key. |
+| include |	`String` |	Optional |	"user1" | - |	An optional value that can be included in the generated API key. It can be used to identify the user or application associated with the key. |
+| add_dashes |	`boolean` |	Optional |	True | False |	A value used to determine wheather to add dashes or not in a key |
+| prefix | `String` | Optional | "hf" | None | A Value that is added infornt of the apikey generted to make your key unique for your platform  |
 
 
 By using this package, you are solely liable for any legal issues that may arise from its unauthorized use or misuse, as well as any security risks that may result from not properly securing the secret key used to generate the API keys.
@@ -121,4 +135,6 @@ This package is provided as is, without any warranties or guarantees of any kind
 
 We encourage you to use the package responsibly, and to report any security issues or bugs you may encounter.
 
-[Nuhman Pk](https://github.com/nuhmanpk)
+
+
+**Happy coding! 🚀**
