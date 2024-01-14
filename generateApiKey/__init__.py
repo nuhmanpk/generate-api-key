@@ -16,6 +16,7 @@ async def generateApiKey(
     seed: str,
     include: str = None,
     add_dashes: bool = False,
+    prefix: str = None
 ) -> str:
     """
     Generate a secure API key based on a secret, seed, and optional parameters.
@@ -24,7 +25,8 @@ async def generateApiKey(
         secret: The secret key used for hashing.
         seed: A unique identifier used to personalize the key.
         include: An optional string to be included in the key generation process.
-        add_dashes: Whether to add dashes to the generated key for improved readability.
+        add_dashes: Whether to add dashes to the generated key for improved readability. Default False
+        prefix: A string prefix for the API key. Followed by a '-'. Default None
 
     Returns:
         A unique and secure API key.
@@ -57,22 +59,25 @@ async def generateApiKey(
         api_key = hmac.new(
             secret.encode(), combined_hash.encode(), hashlib.sha256
         ).hexdigest()
-        return str(uuid.uuid5(uuid.NAMESPACE_DNS, api_key))
+        api_key = str(uuid.uuid5(uuid.NAMESPACE_DNS, api_key))
+    else:
+        salt = token_bytes(16)
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            salt=salt,
+            iterations=pbkdf2_iterations,
+            length=32,
+        )
+        seed = f"{seed}{current_timestamp}{numeric_hash}".encode()
+        if include:
+            pos = random.randint(0, len(seed))
+            seed = seed[:pos] + include.encode() + seed[pos:]
 
-    salt = token_bytes(16)
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        salt=salt,
-        iterations=pbkdf2_iterations,
-        length=32,
-    )
-    seed = f"{seed}{current_timestamp}{numeric_hash}".encode()
-    if include:
-        pos = random.randint(0, len(seed))
-        seed = seed[:pos] + include.encode() + seed[pos:]
+        key_bytes = kdf.derive(seed)
+        key_base64 = base64.urlsafe_b64encode(key_bytes).decode()
+        api_key = re.sub(r"[^a-zA-Z0-9]", "", key_base64)
 
-    key_bytes = kdf.derive(seed)
-    key_base64 = base64.urlsafe_b64encode(key_bytes).decode()
-    api_key = re.sub(r"[^a-zA-Z0-9]", "", key_base64)
+    if prefix:
+        api_key = f"{prefix}-{api_key}"
 
     return api_key
