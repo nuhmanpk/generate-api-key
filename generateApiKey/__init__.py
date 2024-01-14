@@ -10,13 +10,16 @@ from secrets import token_bytes
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
+from .utils import generate_expiration_token
 
 async def generateApiKey(
     secret: str,
     seed: str,
     include: str = None,
     add_dashes: bool = False,
-    prefix: str = None
+    prefix: str = None,
+    length: int = None,
+    expiry: int = None
 ) -> str:
     """
     Generate a secure API key based on a secret, seed, and optional parameters.
@@ -25,8 +28,10 @@ async def generateApiKey(
         secret: The secret key used for hashing.
         seed: A unique identifier used to personalize the key.
         include: An optional string to be included in the key generation process.
-        add_dashes: Whether to add dashes to the generated key for improved readability. Default False
-        prefix: A string prefix for the API key. Followed by a '-'. Default None
+        add_dashes: Whether to add dashes to the generated key for improved readability.
+        prefix: A string prefix for the API key. Followed by a '-'.
+        length: The desired length of the API key. If provided, the key will be trimmed or padded accordingly.
+        expiry: Expiry time provided in minutes.
 
     Returns:
         A unique and secure API key.
@@ -77,7 +82,36 @@ async def generateApiKey(
         key_base64 = base64.urlsafe_b64encode(key_bytes).decode()
         api_key = re.sub(r"[^a-zA-Z0-9]", "", key_base64)
 
+    if length:
+        if add_dashes:
+            # only trim dashes if length is greaterthan 12
+            if length > 12:
+              api_key = api_key[:length]
+        else:
+            api_key = api_key[:length]
+
     if prefix:
         api_key = f"{prefix}-{api_key}"
 
+    if expiry:
+        expiration_token = await generate_expiration_token(expiry)    
+
     return api_key
+
+async def is_token_valid(token: str) -> bool:
+    """
+    Check if the provided expiration token is still valid.
+
+    Args:
+        token: The expiration token.
+
+    Returns:
+        True if the token is valid, False otherwise.
+    """
+    if not token.includes("exp_"):
+        return False
+    
+    expiration_time = int(token.split("_")[1])
+    current_time = int(time.time())
+    
+    return current_time < expiration_time
