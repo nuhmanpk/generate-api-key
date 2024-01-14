@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
-def generateApiKey(
+async def generateApiKey(
     secret: str,
     seed: str,
     include: str = None,
