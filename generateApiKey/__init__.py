@@ -108,10 +108,12 @@ async def is_token_valid(token: str) -> bool:
     Returns:
         True if the token is valid, False otherwise.
     """
-    if not token.includes("exp_"):
+    if not "_" in token:
         return False
     
-    expiration_time = int(token.split("_")[1])
-    current_time = int(time.time())
-    
-    return current_time < expiration_time
+    try:
+        expiration_time = int(token.split("_")[1])
+        current_time = int(time.time())
+        return current_time < expiration_time
+    except (IndexError, ValueError):
+        return False

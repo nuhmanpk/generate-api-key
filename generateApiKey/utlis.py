@@ -11,4 +11,4 @@ async def generate_expiration_token(minutes: int) -> str:
             An expiration token.
         """
         expiration_time = int(time.time()) + (minutes * 60)
-        return f"exp_{expiration_time}"
+        return f"_{expiration_time}"
