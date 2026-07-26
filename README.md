@@ -4,7 +4,7 @@
 ![PyPI](https://img.shields.io/pypi/v/generateApiKey)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/generateApiKey)
 [![Downloads](https://static.pepy.tech/personalized-badge/generateApiKey?period=week&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/Week)](https://pepy.tech/project/generateApiKey)
-[![Upload to PIP](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml/badge.svg?branch=main&event=workflow_dispatch)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/Pypi-uploads.yml)
+[![Upload to PIP](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml/badge.svg)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml)
 ![PyPI - Format](https://img.shields.io/pypi/format/generateApiKey)
 # API Key Generation Package
 
@@ -39,93 +39,107 @@ To install your package, you can use the pip package manager by running the foll
 pip install generateApiKey
 ```
 
-# Importing the package
-Once the package is installed, you can import the package in your code by using the import statement:
-```python
-from generateApiKey import generateApiKey
-```
-# Generating an API key
-To generate an API key, you can use the generateApiKey() function and pass in the secret, seed, and an optional include keyword. For example:
+# Quick start
 
-### Without Dashes
+The simplest way to get a secure key — no arguments, no `await`:
 
 ```python
-from generateApiKey import generateApiKey
+from generateApiKey import generate_api_key
 
-seed='12'
-secret='Topsecrect'
-api_key= await generateApiKey(secret,seed) # KaEQfEOP0ZMXbkgElkuPRv6iUrMxQDytwrQPKhH0eO8
-print(api_key)
+api_key = generate_api_key()   # 'uYTvAuzrTHAeU202ScbN6jV8kxIMogDf'
 ```
 
+That's it. Everything below is optional.
+
+## Common recipes
 
 ```python
-from generateApiKey import generateApiKey
-api_key = await generateApiKey(secret='Topsecret', seed='12',include='user1') # iFuOcas8lSCw8jKWVIg4ru9WXhfr8erl5YzWc8kQw
-print(api_key)
+generate_api_key(length=48)                       # longer key
+generate_api_key(prefix="sk")                      # 'sk-gRsNbb2lQ1cZxoT3...'
+generate_api_key(dashes=True)                      # 'GdBA-6DhM-M3Fv-g99C...'
+generate_api_key(charset="hex", length=32)         # hex only
+generate_api_key(charset="base58")                 # no ambiguous 0/O/I/l
+generate_api_key(charset="ABC123", length=10)      # your own alphabet
+generate_api_key(case="upper", charset="alphabetic")
 ```
-### With Dashes
+
+## Charsets
+
+Pass a preset name or a literal string of characters to `charset`:
+
+| Preset | Characters |
+|--------|-----------|
+| `alphanumeric` (default) | `A-Z a-z 0-9` |
+| `base62` | `A-Z a-z 0-9` |
+| `base58` | base62 minus `0 O I l` |
+| `base64url` | `A-Z a-z 0-9 - _` |
+| `alphabetic` | `A-Z a-z` |
+| `numeric` | `0-9` |
+| `hex` | `0-9 a-f` |
+| `base16` | `0-9 A-F` |
+
+## Expiring keys
+
+Set `expiry` (minutes). The returned key **is a string** but also carries expiry metadata:
 
 ```python
-from generateApiKey import generateApiKey
-api_key = await generateApiKey(secret='Topsecret', seed='12',
-    include='user1',add_dashes=True) # 1ff0f93f-c14d-5768-b324-626f1099948b
-print(api_key)
+key = generate_api_key(expiry=60)
+
+headers = {"Authorization": key}   # works — it's a str
+key.expires_at                     # unix timestamp
+key.is_expired                     # False (until 60 min pass)
 ```
-### With prefix
+
+## Derived keys (secret + seed)
+
+Provide both `secret` and `seed` to derive the key deterministically from them
+(HMAC-SHA256). A random salt still makes each generated key unique:
 
 ```python
-seed='12'
-secret='Topsecrect'
-api_key=await generateApiKey(secret,seed,
-    prefix='hf',add_dashes=True) # hf-db27e2d7-d0bb-5014-9f75-4c2fda33f727 
-print(api_key)
-
+generate_api_key("mysecret", "user-42", length=20, include="prod")
 ```
 
-### With include
+## Async is optional
+
+The library is synchronous by default. When you need an awaitable:
 
 ```python
-secret = 'mysecret'
-seed = 'randomseed'
-include = "TopSecretWord"
-api_key = await generateApiKey(secret, seed, include)
-print(api_key)
+from generateApiKey import generate_api_key_async
+
+api_key = await generate_api_key_async(length=48, prefix="sk")
 ```
-This will generate an API key based on the provided secret, seed, and include keyword.
+
+> The original `await generateApiKey(secret, seed, ...)` still works unchanged
+> for backwards compatibility, but `generate_api_key` is recommended.
 
 ## Error handling
-It is a good practice to handle errors, you can use the try and except block to handle any exception that may occur during the key generation process.
 
 ```python
 try:
-    secret = 'mysecret'
-    seed = 'randomseed'
-    include = "Production"
-    api_key = await generateApiKey(secret, seed, include)
-    print(api_key)
-except Exception as e:
-    print(e)
+    api_key = generate_api_key(length=32)
+except ValueError as e:
+    print(e)   # e.g. bad length, or only one of secret/seed given
 ```
 
-You can use the None return in the package function, to check if the key generation was successful.
+# Parameters
 
-```python
-api_key = await generateApiKey(secret, seed, include)
-if api_key is None:
-    print("Failed to generate api key")
-else:
-    print(api_key)
-```
-# Parameters 
+All parameters are optional. Call `generate_api_key()` with nothing for a secure default.
 
-| **Variable** |	**Type** |	**Required** |	**Example Value** | **Default** |	**Description** |
-|----------|---------|-----------|--------------------|-------------|-------------------|
-| secret |	`String` |	Yes |	"Topsecret" | - |	The secret key used to generate the API key. It should be kept private and not shared with unauthorized parties. |
-| seed |	`String` |	Yes |	"12" | - |	A value used to seed the generation of the API key. It can be any value, but it should be unique for each key. |
-| include |	`String` |	Optional |	"user1" | - |	An optional value that can be included in the generated API key. It can be used to identify the user or application associated with the key. |
-| add_dashes |	`boolean` |	Optional |	True | False |	A value used to determine wheather to add dashes or not in a key |
-| prefix | `String` | Optional | "hf" | None | A Value that is added infornt of the apikey generted to make your key unique for your platform  |
+| **Parameter** | **Type** | **Default** | **Description** |
+|---------------|----------|-------------|-----------------|
+| `secret` | `str` | `None` | Optional secret. Given with `seed`, the key is HMAC-derived instead of random. |
+| `seed` | `str` | `None` | Optional per-key value, used together with `secret`. |
+| `length` | `int` | `32` | Number of characters in the key body. |
+| `charset` | `str` | `"alphanumeric"` | Preset name (see table) or a literal string of allowed characters. |
+| `case` | `str` | `"mixed"` | `"mixed"`, `"lower"` or `"upper"`. Affects letters only. |
+| `prefix` | `str` | `None` | Prefix joined with `separator`, e.g. `sk-...`. |
+| `separator` | `str` | `"-"` | String between prefix and key. |
+| `dashes` | `bool` | `False` | Group the key with dashes for readability. |
+| `dash_group` | `int` | `4` | Group size when `dashes=True`. |
+| `include` | `str` | `None` | Extra value mixed into a derived key (needs `secret` + `seed`). |
+| `expiry` | `int` | `None` | Expiry in minutes; sets `.expires_at` / `.is_expired`. |
+
+Returns an `ApiKey` — a `str` subclass, so it works anywhere a string does.
 
 
 By using this package, you are solely liable for any legal issues that may arise from its unauthorized use or misuse, as well as any security risks that may result from not properly securing the secret key used to generate the API keys.
