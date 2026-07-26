@@ -1,16 +1,138 @@
-import hashlib
-import hmac
-import uuid
-import random
-import base64
-import time
-import datetime
-import re
-from secrets import token_bytes
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+"""generateApiKey — simple, secure API key generation.
 
-from .utils import generate_expiration_token
+Quick start::
+
+    from generateApiKey import generate_api_key
+
+    key = generate_api_key()                       # secure random, 32 chars
+    key = generate_api_key(length=48, prefix="sk") # sk-xxxxxxxx...
+    key = generate_api_key(expiry=60)              # expires in 60 minutes
+
+Everything is synchronous by default. Use :func:`generate_api_key_async`
+when you need an awaitable, or the legacy :func:`generateApiKey`.
+"""
+
+import time
+
+from .utils import (
+    CHARSETS,
+    build_charset,
+    random_key,
+    derived_key,
+    add_dashes,
+)
+
+__all__ = [
+    "generate_api_key",
+    "generate_api_key_async",
+    "generateApiKey",
+    "ApiKey",
+    "is_expired",
+    "is_token_valid",
+    "CHARSETS",
+]
+
+
+class ApiKey(str):
+    """An API key.
+
+    Behaves exactly like a ``str`` (usable in headers, f-strings, comparisons)
+    while carrying optional expiry metadata::
+
+        key = generate_api_key(expiry=60)
+        headers = {"Authorization": key}   # works, it's a str
+        key.expires_at                     # unix timestamp or None
+        key.is_expired                     # bool
+    """
+
+    expires_at = None
+
+    def __new__(cls, value: str, expires_at: int = None) -> "ApiKey":
+        obj = super().__new__(cls, value)
+        obj.expires_at = expires_at
+        return obj
+
+    @property
+    def is_expired(self) -> bool:
+        """True if an expiry was set and it is now in the past."""
+        return self.expires_at is not None and time.time() >= self.expires_at
+
+
+def generate_api_key(
+    secret: str = None,
+    seed: str = None,
+    *,
+    length: int = 32,
+    charset: str = "alphanumeric",
+    case: str = "mixed",
+    prefix: str = None,
+    separator: str = "-",
+    dashes: bool = False,
+    dash_group: int = 4,
+    include: str = None,
+    expiry: int = None,
+) -> ApiKey:
+    """Generate a secure API key.
+
+    With no arguments it returns a cryptographically random key. Pass both
+    ``secret`` and ``seed`` to derive the key from them via HMAC-SHA256 instead.
+
+    Args:
+        secret: Optional secret. If given with ``seed``, the key is HMAC-derived.
+        seed: Optional per-key value used together with ``secret``.
+        length: Number of characters in the key body (before prefix/dashes). Default 32.
+        charset: A preset name (see ``CHARSETS``) or a literal string of allowed
+            characters. Presets: alphanumeric, base62, base58, base64url,
+            alphabetic, numeric, hex, base16.
+        case: ``"mixed"`` (default), ``"lower"`` or ``"upper"``.
+        prefix: Optional prefix, joined with ``separator`` (e.g. ``sk-...``).
+        separator: String used between prefix and key. Default ``"-"``.
+        dashes: If True, group the key body with dashes for readability.
+        dash_group: Group size when ``dashes`` is True. Default 4.
+        include: Extra value mixed into a derived key (requires secret + seed).
+        expiry: Optional expiry in minutes. Sets ``ApiKey.expires_at``.
+
+    Returns:
+        An :class:`ApiKey` (a ``str`` subclass).
+
+    Raises:
+        ValueError: If ``length`` < 1, or a bad ``charset``/``case`` is given, or
+            only one of ``secret``/``seed`` is supplied.
+    """
+    if length < 1:
+        raise ValueError("length must be a positive integer.")
+    if (secret is None) != (seed is None):
+        raise ValueError("Provide both 'secret' and 'seed', or neither.")
+
+    chars = build_charset(charset, case)
+
+    if secret and seed:
+        body = derived_key(secret, seed, include, length, chars)
+    else:
+        body = random_key(length, chars)
+
+    if dashes:
+        body = add_dashes(body, dash_group)
+
+    key = f"{prefix}{separator}{body}" if prefix else body
+
+    expires_at = int(time.time()) + expiry * 60 if expiry else None
+    return ApiKey(key, expires_at)
+
+
+async def generate_api_key_async(*args, **kwargs) -> ApiKey:
+    """Async wrapper around :func:`generate_api_key` with the same signature."""
+    return generate_api_key(*args, **kwargs)
+
+
+def is_expired(key: "ApiKey") -> bool:
+    """Return True if ``key`` is an expired :class:`ApiKey`."""
+    return getattr(key, "is_expired", False)
+
+
+# ---------------------------------------------------------------------------
+# Backwards-compatible legacy API (async). Prefer generate_api_key above.
+# ---------------------------------------------------------------------------
 
 async def generateApiKey(
     secret: str,
@@ -19,101 +141,33 @@ async def generateApiKey(
     add_dashes: bool = False,
     prefix: str = None,
     length: int = None,
-    expiry: int = None
-) -> str:
+    expiry: int = None,
+) -> ApiKey:
+    """Legacy async entry point. Kept for backwards compatibility.
+
+    New code should use :func:`generate_api_key` (synchronous, more options).
     """
-    Generate a secure API key based on a secret, seed, and optional parameters.
-
-    Args:
-        secret: The secret key used for hashing.
-        seed: A unique identifier used to personalize the key.
-        include: An optional string to be included in the key generation process.
-        add_dashes: Whether to add dashes to the generated key for improved readability.
-        prefix: A string prefix for the API key. Followed by a '-'.
-        length: The desired length of the API key. If provided, the key will be trimmed or padded accordingly.
-        expiry: Expiry time provided in minutes.
-
-    Returns:
-        A unique and secure API key.
-
-    Raises:
-        ValueError: If the secret or seed is an empty string.
-    """
-
     if not secret or not seed:
         raise ValueError("Secret and seed cannot be empty strings.")
 
-    current_timestamp = int(time.time())
-    now = datetime.datetime.now()
-    pbkdf2_iterations = random.randint(1000, 10000)
-    numeric_representation = int(
-        f"{now.year}{now.month:02d}{now.day:02d}{now.hour:02d}{now.minute:02d}{now.second:02d}"
+    return generate_api_key(
+        secret,
+        seed,
+        length=length or 32,
+        include=include,
+        prefix=prefix,
+        dashes=add_dashes,
+        dash_group=4,
+        expiry=expiry,
     )
 
-    timestamp_hash = hashlib.sha256(str(current_timestamp).encode()).hexdigest()
-    numeric_hash = hashlib.sha256(str(numeric_representation).encode()).hexdigest()
-
-    if add_dashes:
-        message = str(seed).encode()
-        if include:
-            pos = random.randint(0, 32)
-            message = message[:pos] + include.encode() + message[pos:]
-
-        combined_hash = f"{timestamp_hash}{numeric_hash}{message}"
-        combined_hash = "".join(random.sample(combined_hash, len(combined_hash)))
-        api_key = hmac.new(
-            secret.encode(), combined_hash.encode(), hashlib.sha256
-        ).hexdigest()
-        api_key = str(uuid.uuid5(uuid.NAMESPACE_DNS, api_key))
-    else:
-        salt = token_bytes(16)
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            salt=salt,
-            iterations=pbkdf2_iterations,
-            length=32,
-        )
-        seed = f"{seed}{current_timestamp}{numeric_hash}".encode()
-        if include:
-            pos = random.randint(0, len(seed))
-            seed = seed[:pos] + include.encode() + seed[pos:]
-
-        key_bytes = kdf.derive(seed)
-        key_base64 = base64.urlsafe_b64encode(key_bytes).decode()
-        api_key = re.sub(r"[^a-zA-Z0-9]", "", key_base64)
-
-    if length:
-        if add_dashes:
-            # only trim dashes if length is greaterthan 12
-            if length > 12:
-              api_key = api_key[:length]
-        else:
-            api_key = api_key[:length]
-
-    if prefix:
-        api_key = f"{prefix}-{api_key}"
-
-    if expiry:
-        expiration_token = await generate_expiration_token(expiry)    
-
-    return api_key
 
 async def is_token_valid(token: str) -> bool:
-    """
-    Check if the provided expiration token is still valid.
-
-    Args:
-        token: The expiration token.
-
-    Returns:
-        True if the token is valid, False otherwise.
-    """
-    if not "_" in token:
+    """Legacy check for the ``_<timestamp>`` expiry token format."""
+    if "_" not in token:
         return False
-    
     try:
         expiration_time = int(token.split("_")[1])
-        current_time = int(time.time())
-        return current_time < expiration_time
+        return int(time.time()) < expiration_time
     except (IndexError, ValueError):
         return False
