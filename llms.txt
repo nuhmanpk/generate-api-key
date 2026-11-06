@@ -1,0 +1,27 @@
+# generateapikey
+
+> Zero-dependency Python library for secure API keys and MFA: random or derived keys, prefixes, checksums, expiry, storage hashing, TOTP/HOTP, recovery codes, email/SMS one-time codes, signed magic-link tokens and attempt limiting.
+
+Install with `pip install generateapikey` and import `generateapikey` (lowercase). With the package installed, `generate-api-key --llms` prints the full usage guide for that exact version.
+
+## Docs
+
+- [Full LLM guide](https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/generateapikey/llms-full.txt): every public function, its options, and rules for correct use
+- [README](https://github.com/nuhmanpk/generate-api-key/blob/main/README.md): human-oriented docs with examples
+- [Changelog](https://github.com/nuhmanpk/generate-api-key/blob/main/CHANGELOG.md): what changed in each version, including breaking changes
+
+## Source
+
+- [generateapikey/__init__.py](https://github.com/nuhmanpk/generate-api-key/blob/main/generateapikey/__init__.py): `generate_api_key`, `ApiKey`, batch/async, re-exports
+- [generateapikey/utils.py](https://github.com/nuhmanpk/generate-api-key/blob/main/generateapikey/utils.py): charsets, unbiased sampling, checksum, hashing
+- [generateapikey/mfa.py](https://github.com/nuhmanpk/generate-api-key/blob/main/generateapikey/mfa.py): TOTP/HOTP, recovery codes, OTP, AttemptLimiter
+- [generateapikey/tokens.py](https://github.com/nuhmanpk/generate-api-key/blob/main/generateapikey/tokens.py): signed expiring tokens, optional session binding
+- [generateapikey/integrations/](https://github.com/nuhmanpk/generate-api-key/tree/main/generateapikey/integrations): API key auth core plus FastAPI/Starlette/Django/DRF/Flask/Litestar/Sanic/aiohttp/Quart/Falcon adapters
+- [generateapikey/crypto.py](https://github.com/nuhmanpk/generate-api-key/blob/main/generateapikey/crypto.py): AES-GCM SecretBox for secrets at rest
+- [generateapikey/limiters.py](https://github.com/nuhmanpk/generate-api-key/blob/main/generateapikey/limiters.py): Redis attempt limiters
+- [examples/fastapi_app.py](https://github.com/nuhmanpk/generate-api-key/blob/main/examples/fastapi_app.py): complete app (keys, 2FA, recovery codes, magic links)
+
+## Optional
+
+- [Agent skill](https://github.com/nuhmanpk/generate-api-key/blob/main/skills/generateapikey/SKILL.md): drop-in skill that teaches coding agents to use this library
+- [PyPI](https://pypi.org/project/generateapikey/)

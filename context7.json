@@ -1,0 +1,16 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "generateapikey",
+  "description": "Zero-dependency Python library for secure API keys and MFA: keys, checksums, hashing, TOTP/HOTP, recovery codes, OTPs, signed tokens.",
+  "folders": [],
+  "excludeFolders": ["tests", "assets", ".github"],
+  "excludeFiles": ["CLAUDE.md"],
+  "rules": [
+    "Import as lowercase `generateapikey`; the `generateApiKey` import name is deprecated.",
+    "Use synchronous `generate_api_key()`; legacy `await generateApiKey()` is only for old code.",
+    "Never store raw API keys, OTPs or recovery codes: store hash_api_key / hash_otp / hash_recovery_code and check with the matching verify_* function.",
+    "TOTP secrets must be encrypted at rest, not hashed.",
+    "Rate-limit every code check with AttemptLimiter or a shared store.",
+    "generate_api_key(secret, seed) is deterministic; omit both for random keys."
+  ]
+}

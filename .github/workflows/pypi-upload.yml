@@ -1,27 +1,55 @@
 name: Upload to PIP
+
+# Publishes with PyPI Trusted Publishing (OIDC): no long-lived token stored in GitHub.
+# One-time setup on PyPI -> generateapikey -> Settings -> Publishing -> add GitHub publisher:
+#   owner: nuhmanpk, repository: generate-api-key, workflow: pypi-upload.yml, environment: pypi
+
 on:
-  release: 
-    types: [created]
-  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
 jobs:
-  upload:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
         with:
-          python-version: 3.9
-     
-      - name: "Installs dependencies"
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install setuptools wheel twine
-      
-      - name: "Builds and uploads to PyPI"
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test,all]"
+          python -m pytest -q
+      - name: Build
         run: |
-          python3 setup.py sdist bdist_wheel
-          python3 -m twine upload dist/*
-      
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TWINE_TOKEN }}
+          python -m pip install build twine
+          python -m build
+          python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    # Separate job: nothing from the test/build environment runs here, and only
+    # this job can mint the short-lived PyPI token.
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/generateapikey/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,0 +1,15 @@
+name: Feature request
+description: Suggest an idea or a new integration
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: A short code sample of how you'd like to use it.
