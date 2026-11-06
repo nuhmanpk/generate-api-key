@@ -1,0 +1,128 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "generateapikey"
+version = "0.5.0"  # keep in sync with generateapikey/__init__.py (tested)
+description = "Fast, secure, zero-dependency API keys and MFA for Python: keys, checksums, hashing, rotation, TOTP/HOTP, recovery codes, OTPs, magic links, plus FastAPI/Django/DRF/Flask/Starlette/Litestar/Sanic/aiohttp/Quart/Falcon integrations."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Nuhman Pk", email = "nuhmanpk7@gmail.com" }]
+requires-python = ">=3.9"
+dependencies = []
+keywords = ["api key", "api-key", "token", "secret", "security", "generator", "authentication", "mfa", "2fa", "totp", "hotp", "otp", "recovery codes", "magic link", "fastapi", "django", "flask", "starlette", "litestar", "django-rest-framework", "sanic", "aiohttp", "quart", "falcon"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Security :: Cryptography",
+    "Topic :: System :: Systems Administration :: Authentication/Directory",
+    "Typing :: Typed",
+    "Framework :: FastAPI",
+    "Framework :: Django",
+    "Framework :: Flask",
+    "Framework :: AsyncIO",
+    "Framework :: aiohttp",
+]
+
+[project.optional-dependencies]
+qr = ["qrcode>=7.4", "pypng>=0.20220715"]
+fastapi = ["fastapi>=0.100"]
+starlette = ["starlette>=0.27"]
+django = ["django>=4.2"]
+drf = ["django>=4.2", "djangorestframework>=3.14"]
+flask = ["flask>=2.2"]
+litestar = ["litestar>=2.0"]
+sanic = ["sanic>=23.3"]
+aiohttp = ["aiohttp>=3.8"]
+quart = ["quart>=0.19"]
+falcon = ["falcon>=3.1"]
+crypto = ["cryptography>=42"]
+redis = ["redis>=5"]
+all = ["generateapikey[qr,crypto,redis,fastapi,django,drf,flask,litestar,sanic,aiohttp,quart,falcon]"]
+test = ["pytest>=7", "httpx>=0.24", "fakeredis[lua]>=2.20", "sanic-testing>=23.3"]
+dev = ["generateapikey[test,all]", "ruff>=0.17", "mypy>=2.0", "bandit>=1.7", "pre-commit>=3"]
+
+[project.scripts]
+generate-api-key = "generateapikey.__main__:main"
+generateapikey = "generateapikey.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/nuhmanpk/generate-api-key"
+Documentation = "https://github.com/nuhmanpk/generate-api-key/blob/main/README.md"
+Source = "https://github.com/nuhmanpk/generate-api-key"
+Tracker = "https://github.com/nuhmanpk/generate-api-key/issues"
+Changelog = "https://github.com/nuhmanpk/generate-api-key/blob/main/CHANGELOG.md"
+"LLM docs" = "https://github.com/nuhmanpk/generate-api-key/blob/main/llms.txt"
+Funding = "https://github.com/sponsors/nuhmanpk"
+"Buy me a coffee" = "https://buymeacoffee.com/nuhmanpk"
+
+[tool.setuptools]
+packages = ["generateapikey", "generateapikey.integrations"]
+py-modules = ["generateApiKey"]  # backwards-compatible import alias
+
+[tool.setuptools.package-data]
+generateapikey = ["py.typed", "llms-full.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF", "PL", "C4", "PIE", "RET"]
+ignore = [
+    "PLR0913",  # many keyword options is the API style
+    "PLR2004",  # magic numbers are protocol constants (RFC digits etc.)
+    "UP007", "UP045",  # keep Optional/Union: Python 3.9 support
+    "RUF001", "RUF002", "RUF003",  # intentional unicode ellipsis
+    "S105", "S106",  # env var names are not passwords
+    "PLC0415",  # lazy imports of optional deps are deliberate
+    "PLR0911", "PLR0912",  # validation / CLI dispatch is naturally branchy
+    "E501",  # the formatter owns line length
+    "C408",  # dict(k=v) is fine
+]
+
+[tool.ruff.lint.per-file-ignores]
+"examples/*" = ["B008"]  # FastAPI Depends() idiom
+"tests/*" = ["S101", "S105", "S106", "S301", "S311", "S603", "PLR0915", "B008", "B018", "B023", "E402", "F811", "PLW0108", "RUF012", "RUF059", "RET", "SIM117"]
+
+[tool.mypy]
+python_version = "3.10"  # oldest mypy supports; ruff target-version keeps 3.9 syntax
+strict = true
+warn_unused_ignores = true
+files = ["generateapikey", "generateApiKey.py"]
+
+[[tool.mypy.overrides]]
+# Framework adapters are thin glue over (often untyped) framework objects;
+# the logic they call (integrations/__init__.py) stays fully strict.
+module = [
+    "generateapikey.integrations.fastapi", "generateapikey.integrations.starlette",
+    "generateapikey.integrations.django", "generateapikey.integrations.drf",
+    "generateapikey.integrations.flask", "generateapikey.integrations.litestar",
+    "generateapikey.integrations.sanic", "generateapikey.integrations.aiohttp",
+    "generateapikey.integrations.quart", "generateapikey.integrations.falcon",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+disallow_untyped_decorators = false
+disallow_subclassing_any = false
+disallow_any_generics = false
+warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = ["django.*", "qrcode.*", "png", "sanic.*", "sanic_testing.*", "falcon.*", "quart.*", "litestar.*", "rest_framework.*", "fakeredis.*", "redis.*", "asgiref.*"]
+ignore_missing_imports = true

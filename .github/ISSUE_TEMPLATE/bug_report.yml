@@ -1,0 +1,31 @@
+name: Bug report
+description: Something doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "**Security issue?** Don't file it here. Use a [private security advisory](https://github.com/nuhmanpk/generate-api-key/security/advisories/new) instead."
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Include a minimal code sample and the full traceback.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: generateapikey version
+      placeholder: "python -c 'import generateapikey; print(generateapikey.__version__)'"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Python version, OS, framework (if any)

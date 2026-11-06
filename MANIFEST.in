@@ -1,1 +1,6 @@
-include README.md
+include README.md LICENSE CHANGELOG.md llms.txt AGENTS.md CONTRIBUTING.md SECURITY.md
+include generateapikey/py.typed generateapikey/llms-full.txt
+recursive-include tests *.py
+recursive-include examples *.py *.md
+recursive-include benchmarks *.py
+recursive-include skills *.md

@@ -1,0 +1,222 @@
+# generateapikey
+
+> Zero-dependency Python library for secure API keys and MFA: random or derived keys, prefixes, checksums, expiry, storage hashing, TOTP/HOTP authenticator codes, recovery codes, email/SMS one-time codes, signed magic-link tokens, and attempt limiting. Python >= 3.9, fully typed.
+
+Install: `pip install generateapikey` (QR codes: `pip install "generateapikey[qr]"`).
+Import name: `generateapikey` (lowercase). The old `generateApiKey` import still works but is deprecated. Do not use it in new code.
+Print this guide from an installed copy: `generate-api-key --llms`.
+
+## Rules for correct use
+
+- Use `generate_api_key()` (sync). The legacy `await generateApiKey(...)` exists only for old code.
+- Never store raw API keys, OTPs or recovery codes. Store `hash_api_key(key)` / `hash_otp(code)` / `hash_recovery_code(code)` and check with the matching `verify_*` function, which is constant-time.
+- TOTP secrets cannot be hashed (the server needs the original). Encrypt them at rest with `generateapikey.crypto.SecretBox`.
+- Always rate-limit code checks: call `AttemptLimiter.hit(key)` *before* verifying, since it is atomic. Don't use the `is_blocked()` then `fail()` pattern, which has a race. With multiple processes, use Redis or the database.
+- Signing secrets for tokens must be at least 16 characters. Use `secrets.token_urlsafe(32)`, kept in env or config and out of the database. Peppers must be non-empty.
+- OTPs and recovery codes are hashed with salted PBKDF2. Pass a `pepper` too, because short codes are brute-forceable from a leaked database.
+- `repr(ApiKey)` is redacted. `str(key)` gives the full value.
+- `generate_api_key(secret, seed)` is deterministic: the same inputs give the same key. Omit secret/seed for random keys (the normal case).
+- `ApiKey` is a `str` subclass. Use it anywhere a string works. Expiry metadata (`expires_at`) is not part of the string, so persist it separately.
+- Random keys under 128 bits of entropy emit `WeakKeyWarning`. Increase `length` instead of silencing it.
+
+## API keys
+
+```python
+from generateapikey import generate_api_key, generate_api_keys, hash_api_key, verify_api_key, verify_checksum
+
+key = generate_api_key()                                  # 32 chars alphanumeric, ~190 bits
+key = generate_api_key(prefix="sk_live", separator="_", checksum=True)
+keys = generate_api_keys(100, prefix="sk")                # batch
+
+stored = hash_api_key(key)                                # "sha256$<hex>"; save this
+stored = hash_api_key(key, pepper=PEPPER)                 # "hmac-sha256$<hex>"
+verify_api_key(candidate, stored, pepper=PEPPER)          # bool, constant-time
+verify_checksum(candidate)                                # offline typo/truncation check (checksum=True keys)
+```
+
+`generate_api_key(secret=None, seed=None, *, length=32, charset="alphanumeric", case="mixed", prefix=None, separator="-", dashes=False, dash_group=4, dash_char="-", include=None, expiry=None, checksum=False, min_entropy=None) -> ApiKey`
+
+- `charset`: a preset (`alphanumeric`, `base62`, `base58`, `unambiguous`, `base64url`, `base32`, `crockford`, `alphabetic`, `hex`, `base16`, `numeric`) or any literal string of characters.
+- `case`: `"mixed"`, `"lower"` or `"upper"`.
+- `expiry`: minutes (int/float) or `datetime.timedelta`. Must be > 0.
+- `include`: only with `secret` + `seed`.
+- `checksum=True` appends 6 base62 chars (CRC32) after everything else.
+- Raises `ValueError`/`TypeError` on bad input.
+
+`ApiKey` attributes: `expires_at` (int unix | None), `expires_in` (seconds | None), `expires_at_datetime` (UTC | None), `is_expired` (bool), `.hash(pepper=None)`.
+
+Other: `generate_api_key_async(...)` (awaitable), `entropy_bits(length, charset="alphanumeric", case="mixed")`, `is_expired(key)`, `CHARSETS`, `WeakKeyWarning`.
+
+## Framework integrations (`generateapikey.integrations`)
+
+Use these instead of writing API key auth by hand. Extras: `[fastapi]`, `[starlette]`, `[django]`, `[drf]`, `[flask]`, `[litestar]` or `[all]`.
+
+```python
+from generateapikey.integrations import APIKeyAuth, AuthError, issue_api_key
+
+issued = issue_api_key(prefix="sk", pepper=PEPPER)    # .key (show once), .hashed (store, unique index), .hint (display)
+auth = APIKeyAuth(
+    lookup=find_by_hash,          # (hashed) -> record | None; sync or async
+    pepper=PEPPER, prefix="sk", require_checksum=True,
+    header="X-API-Key", bearer=True, query_param=None,
+    validate=record_is_active,    # default: rejects revoked / is_active=False / expired (expires_at datetime or ts)
+    limiter=None,                 # AttemptLimiter keyed by client IP -> 429
+    on_success=None,              # e.g. update last_used
+)
+record = auth.authenticate(key, client=ip)          # or: await auth.aauthenticate(...); raises AuthError(.status 401|429)
+key = auth.extract(headers, query)                  # X-API-Key, then Authorization: Bearer
+```
+
+```python
+# FastAPI: also registers the OpenAPI security scheme
+from generateapikey.integrations.fastapi import APIKeyDependency
+require_key = APIKeyDependency(auth)
+@app.get("/x")
+async def x(key = Depends(require_key)): ...         # also request.state.api_key
+
+# Starlette
+from generateapikey.integrations.starlette import APIKeyBackend, on_auth_error
+Middleware(AuthenticationMiddleware, backend=APIKeyBackend(auth), on_error=on_auth_error)  # request.user.record
+
+# Django
+from generateapikey.integrations.django import AbstractAPIKey, model_lookup, touch_last_used, api_key_required, APIKeyMiddleware
+class APIKey(AbstractAPIKey): user = models.ForeignKey(...)
+obj, raw = APIKey.objects.create_key(pepper=PEPPER, name="CI", user=u, key_options={"prefix": "sk"})
+auth = APIKeyAuth(lookup=model_lookup(APIKey), pepper=PEPPER, on_success=touch_last_used)
+@api_key_required(auth)                              # sync or async view; request.api_key
+# middleware: settings.GENERATEAPIKEY_AUTH = "pkg.module.auth"
+
+# Django REST Framework
+# REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ["generateapikey.integrations.drf.APIKeyAuthentication"]}
+from generateapikey.integrations.drf import HasAPIKey   # request.auth = record, request.user = record.user or APIKeyUser
+
+# Flask
+from generateapikey.integrations.flask import require_api_key, FlaskAPIKey
+@require_api_key(auth)                               # g.api_key
+
+# Litestar
+from generateapikey.integrations.litestar import api_key_middleware
+Litestar([...], middleware=[api_key_middleware(auth, exclude=["/health"])])  # request.auth
+```
+
+# Sanic / aiohttp / Quart / Falcon
+from generateapikey.integrations.sanic import require_api_key        # request.ctx.api_key
+from generateapikey.integrations.aiohttp import api_key_middleware   # request["api_key"]; also require_api_key
+from generateapikey.integrations.quart import require_api_key        # g.api_key
+from generateapikey.integrations.falcon import APIKeyMiddleware, AsyncAPIKeyMiddleware, require_api_key  # req.context.api_key
+```
+
+`exclude=[...]` (aiohttp, Falcon, Litestar) matches whole path segments: `/health` covers `/health/x` but not `/healthz`.
+
+Other frameworks: call `auth.extract(...)` and `auth.authenticate(...)` / `auth.aauthenticate(...)`, then map `AuthError.status` to a response.
+
+### Rotation
+
+```python
+new_obj, raw = old_obj.rotate(pepper=PEPPER, grace=timedelta(hours=24))   # Django model; old key valid for 24 h
+auth = APIKeyAuth(lookup=..., pepper=NEW, previous_peppers=[OLD],
+                  on_rehash=lambda record, new_hash: ...)                  # Django: rehash_model(APIKey)
+```
+
+### Shared limiter (`[redis]`)
+
+```python
+from generateapikey.limiters import RedisAttemptLimiter, AsyncRedisAttemptLimiter
+limiter = RedisAttemptLimiter(redis.Redis(), max_attempts=5, window=900)   # same API as AttemptLimiter; atomic Lua
+```
+
+## TOTP (authenticator apps, RFC 6238)
+
+```python
+from generateapikey import generate_totp_secret, totp_uri, verify_totp, totp_now
+from generateapikey.mfa import find_totp_step
+
+secret = generate_totp_secret()                           # base32, 160 bits; store encrypted
+uri = totp_uri(secret, account="alice@example.com", issuer="MyApp")  # render as QR
+verify_totp(secret, code)                                 # bool, window=1 step (+-30s)
+
+# replay protection: persist the step
+step = find_totp_step(secret, code, last_used_step=user.last_step)
+if step is not None:
+    user.last_step = step
+```
+
+Options on totp/verify_totp/find_totp_step/totp_uri: `digits` (6-8), `period` (s, default 30), `algorithm` (`sha1` default, `sha256`, `sha512`), `window`, `at` (unix time).
+HOTP (counter-based): `mfa.hotp(secret, counter)`, `mfa.verify_hotp(secret, code, counter, look_ahead=0)` returns the next counter to store, or None. `mfa.hotp_uri(...)`.
+
+QR (needs the `[qr]` extra): `from generateapikey.qr import qr_svg, qr_png, qr_ascii`. These return an SVG string, PNG bytes and terminal text respectively.
+
+## Recovery codes
+
+```python
+from generateapikey import generate_recovery_codes, hash_recovery_code, verify_recovery_code
+
+codes = generate_recovery_codes(count=10, length=10, group=5)   # ["7KQ2M-9XPAB", ...]; show once
+stored = [hash_recovery_code(c) for c in codes]
+used = verify_recovery_code(user_input, stored)                 # matching hash str, or None
+if used:
+    stored.remove(used)                                         # single use
+```
+
+Input is normalized: case-insensitive, spaces/dashes ignored, O->0, I/L->1.
+
+## Email / SMS one-time codes
+
+```python
+from generateapikey import generate_otp, hash_otp, verify_otp
+
+code = generate_otp(digits=6, expiry=10)                  # ApiKey("583920"), expires_at set
+save(hash_otp(code, pepper=PEPPER), code.expires_at)     # salted PBKDF2
+verify_otp(user_input, stored_hash, stored_expires_at, pepper=PEPPER)  # bool; False once expired
+```
+
+## Signed tokens (magic links, email verification, password reset)
+
+```python
+from generateapikey import generate_signed_token, verify_signed_token
+
+token = generate_signed_token(SECRET, {"uid": 42}, purpose="login", expiry=15)  # minutes
+data = verify_signed_token(token, SECRET, purpose="login")  # {"uid": 42} or None
+meta = verify_signed_token(token, SECRET, purpose="login", with_meta=True)  # {"data", "jti", "exp"}
+```
+
+The payload is signed, not encrypted. `purpose` must match. Store used `jti` values for single-use tokens.
+`context="<session id>"` on both calls binds the token to that session. The context is signed but not stored, so a leaked link fails elsewhere. Don't bind to IP addresses.
+
+## Encrypting secrets at rest (`[crypto]`)
+
+```python
+from generateapikey.crypto import SecretBox, generate_encryption_key, DecryptionError
+box = SecretBox(KEY, old_keys=[OLD_KEY])          # AES-256-GCM; KEY from generate_encryption_key()
+ct = box.encrypt(totp_secret, aad=str(user_id))   # "v1.<kid>.<b64>"
+pt = box.decrypt(ct, aad=str(user_id))            # raises DecryptionError
+box.needs_rotation(ct); box.rotate(ct, aad=...)
+```
+
+## Attempt limiting
+
+```python
+from generateapikey import AttemptLimiter
+
+limiter = AttemptLimiter(max_attempts=5, window=900, max_keys=100_000)
+if not limiter.hit(user_id):          # atomic: counts the attempt first
+    reject("too many attempts")
+if verify_totp(secret, code):
+    limiter.reset(user_id)
+```
+
+In-memory, thread-safe and memory-bounded, for a single process only. `fail()`, `is_blocked()` and `remaining()` also exist.
+
+## CLI
+
+```
+generate-api-key [-n N] [-l LEN] [-c CHARSET] [-p PREFIX] [--checksum] [--expiry MIN] [--hash] [--json]
+generate-api-key totp -a ACCOUNT [-i ISSUER] [--qr]
+generate-api-key code [SECRET | -]       # or $GENERATEAPIKEY_TOTP_SECRET
+generate-api-key recovery [-n N] [--hash]
+generate-api-key otp [--digits N] [--hash]
+generate-api-key token [-s SECRET | -s -] [--purpose P] [--data JSON]   # or $GENERATEAPIKEY_SECRET
+generate-api-key --llms        # print this guide
+```
+
+All commands accept `--json`. Exit code 2 on invalid input. Prefer stdin (`-`) or env vars (`GENERATEAPIKEY_SECRET`, `GENERATEAPIKEY_PEPPER`, `GENERATEAPIKEY_TOTP_SECRET`) over secrets in argv.
