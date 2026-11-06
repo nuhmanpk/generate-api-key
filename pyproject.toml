@@ -51,7 +51,7 @@ crypto = ["cryptography>=42"]
 redis = ["redis>=5"]
 all = ["generateapikey[qr,crypto,redis,fastapi,django,drf,flask,litestar,sanic,aiohttp,quart,falcon]"]
 test = ["pytest>=7", "httpx>=0.24", "fakeredis[lua]>=2.20", "sanic-testing>=23.3"]
-dev = ["generateapikey[test,all]", "ruff>=0.17", "mypy>=2.0", "bandit>=1.7", "pre-commit>=3"]
+dev = ["generateapikey[test,all]", "ruff>=0.17", "mypy>=2.4.1", "bandit>=1.7", "pre-commit>=3"]
 
 [project.scripts]
 generate-api-key = "generateapikey.__main__:main"
