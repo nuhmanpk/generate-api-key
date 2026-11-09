@@ -37,7 +37,7 @@ classifiers = [
 
 [project.optional-dependencies]
 qr = ["qrcode>=8.2", "pypng>=0.20220715"]
-fastapi = ["fastapi>=0.100"]
+fastapi = ["fastapi>=0.162.0"]
 starlette = ["starlette>=0.27"]
 django = ["django>=5.2.19; python_version >= '3.10'", "django>=4.2.30; python_version < '3.10'"]
 drf = ["django>=5.2.19; python_version >= '3.10'", "django>=4.2.30; python_version < '3.10'", "djangorestframework>=3.14"]
