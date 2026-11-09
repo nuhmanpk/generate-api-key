@@ -44,7 +44,7 @@ drf = ["django>=5.2.19; python_version >= '3.10'", "django>=4.2.30; python_versi
 flask = ["flask>=2.2"]
 litestar = ["litestar>=2.0"]
 sanic = ["sanic>=23.3"]
-aiohttp = ["aiohttp>=3.8"]
+aiohttp = ["aiohttp>=3.14.5"]
 quart = ["quart>=0.19"]
 falcon = ["falcon>=3.1"]
 crypto = ["cryptography>=42"]
