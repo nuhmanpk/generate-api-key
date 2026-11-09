@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "generateapikey"
-version = "0.5.0"  # keep in sync with generateapikey/__init__.py (tested)
-description = "Fast, secure, zero-dependency API keys and MFA for Python: keys, checksums, hashing, rotation, TOTP/HOTP, recovery codes, OTPs, magic links, plus FastAPI/Django/DRF/Flask/Starlette/Litestar/Sanic/aiohttp/Quart/Falcon integrations."
+version = "0.6.0"  # keep in sync with generateapikey/__init__.py (tested)
+description = "Zero-dependency API keys and MFA for Python: secure keys, hashing, scopes, rotation, TOTP, recovery codes, JWT, and 10 framework integrations."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Nuhman Pk", email = "nuhmanpk7@gmail.com" }]
 requires-python = ">=3.9"
 dependencies = []
-keywords = ["api key", "api-key", "token", "secret", "security", "generator", "authentication", "mfa", "2fa", "totp", "hotp", "otp", "recovery codes", "magic link", "fastapi", "django", "flask", "starlette", "litestar", "django-rest-framework", "sanic", "aiohttp", "quart", "falcon"]
+keywords = ["api key", "api-key", "token", "secret", "security", "generator", "authentication", "mfa", "2fa", "totp", "hotp", "otp", "recovery codes", "magic link", "fastapi", "django", "flask", "starlette", "litestar", "django-rest-framework", "sanic", "aiohttp", "quart", "falcon", "jwt", "jwks", "scopes", "api key authentication", "api key rotation", "secret scanning", "password reset", "one-time password", "authenticator", "secure random", "ai agents", "llm", "claude", "cursor", "copilot", "llms.txt", "agent skill", "vibe coding"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -39,8 +39,8 @@ classifiers = [
 qr = ["qrcode>=8.2", "pypng>=0.20220715"]
 fastapi = ["fastapi>=0.100"]
 starlette = ["starlette>=0.27"]
-django = ["django>=5.2.19"]
-drf = ["django>=5.2.19", "djangorestframework>=3.14"]
+django = ["django>=5.2.19; python_version >= '3.10'", "django>=4.2.30; python_version < '3.10'"]
+drf = ["django>=5.2.19; python_version >= '3.10'", "django>=4.2.30; python_version < '3.10'", "djangorestframework>=3.14"]
 flask = ["flask>=2.2"]
 litestar = ["litestar>=2.0"]
 sanic = ["sanic>=23.3"]
@@ -48,9 +48,9 @@ aiohttp = ["aiohttp>=3.8"]
 quart = ["quart>=0.19"]
 falcon = ["falcon>=3.1"]
 crypto = ["cryptography>=42"]
-redis = ["redis>=8.1.0"]
+redis = ["redis>=8.1.0; python_version >= '3.10'", "redis>=5.0; python_version < '3.10'"]
 all = ["generateapikey[qr,crypto,redis,fastapi,django,drf,flask,litestar,sanic,aiohttp,quart,falcon]"]
-test = ["pytest>=7", "httpx>=0.24", "fakeredis[lua]>=2.40.0", "sanic-testing>=23.3"]
+test = ["pytest>=7", "pytest-cov>=5", "hypothesis>=6.100", "pyjwt>=2.8", "httpx>=0.24", "fakeredis[lua]>=2.40.0", "sanic-testing>=23.3"]
 dev = ["generateapikey[test,all]", "ruff>=0.17", "mypy>=2.0", "bandit>=1.7", "pre-commit>=3"]
 
 [project.scripts]

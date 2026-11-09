@@ -25,13 +25,16 @@ def test_old_name_aliases_new_package():
 
 def test_old_from_imports_work():
     _fresh_import("generateApiKey")
-    from generateApiKey import generate_api_key, generateApiKey
-    from generateApiKey.mfa import verify_totp  # noqa: F401
-    from generateApiKey.utils import CHARSETS
+    # importlib avoids import-sorting differences between case-sensitive and
+    # case-insensitive filesystems (generateApiKey vs generateapikey).
+    old = importlib.import_module("generateApiKey")
+    old_mfa = importlib.import_module("generateApiKey.mfa")
+    old_utils = importlib.import_module("generateApiKey.utils")
 
-    assert len(generate_api_key()) == 32
-    assert "hex" in CHARSETS
-    assert asyncio.run(generateApiKey("s", "seed")).__class__.__name__ == "ApiKey"
+    assert callable(old_mfa.verify_totp)
+    assert len(old.generate_api_key()) == 32
+    assert "hex" in old_utils.CHARSETS
+    assert asyncio.run(old.generateApiKey("s", "seed")).__class__.__name__ == "ApiKey"
 
 
 def test_submodules_are_the_same_objects():
@@ -49,5 +52,5 @@ def test_version_matches_pyproject():
 
     import generateapikey
 
-    text = (pathlib.Path(__file__).parents[1] / "pyproject.toml").read_text()
+    text = (pathlib.Path(__file__).parents[1] / "pyproject.toml").read_text(encoding="utf-8")
     assert re.search(r'^version = "([^"]+)"', text, re.M).group(1) == generateapikey.__version__

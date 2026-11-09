@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.6.0
+
+### Added
+- `encode_jwt` / `decode_jwt`: standard JWTs with pinned algorithms, `exp`/`nbf`/`iss`/`aud` checks and no `alg: none`. Supports HS256/384/512, and RS256/384/512 and ES256/384/512 with PEM keys via the `crypto` extra. HS* and RS*/ES* can't be mixed in one decode (algorithm-confusion guard). Interoperates with PyJWT.
+- Key scopes: `has_scope`, `has_all_scopes`, `has_any_scope`, `parse_scopes`, and `APIKeyAuth(required_scopes=...)` / `authenticate(key, scopes=...)` (403 when a valid key lacks a scope).
+- `generateapikey.keystore`: `KeyStore` (SQLite, standard library) with create, lookup, list, revoke, last-used and rotation, plus `rotate_api_key` for your own database.
+- Leak detection: `key_pattern`, `find_keys` and `scanning.gitleaks_rule`.
+- JWT: PS256/384/512, EdDSA and `decode_jwt_jwks` (JWKS verification, `kid` only selects among trusted keys).
+- MFA: `steam_code` / `verify_steam_code` (Steam Guard style codes) and `google_migration_uri` (Google Authenticator import).
+- Tests: Hypothesis property and fuzz tests, a chi-square uniformity test (with a modulo-bias control), coverage reporting in CI.
+- `generate-api-key --agent-rules` prints a snippet for `AGENTS.md` / `CLAUDE.md` / `.cursor/rules` that tells coding agents to use this library. Agent-facing docs (`llms.txt`, the LLM guide, the skill, `context7.json`) now include a "when to use" decision table, and PyPI keywords cover agent and JWT/scopes searches.
+- New animated product tour `assets/tour.svg`, shown in the README.
+- `benchmarks/compare.py` and a feature and speed comparison against secrets, pyotp, itsdangerous, PyJWT, shortuuid and nanoid in the README.
+
+### Performance
+- `generate_api_key()` is about 2× faster (5.8 → 2.8 µs): the resolved alphabet is now cached instead of rebuilt on every call.
+
+### Fixed
+- CI: Django extras on Python 3.9, UTF-8 doc reads on Windows, import-order lint.
+
 ## 0.5.0
 
 ### Renamed
@@ -26,7 +46,7 @@ Fixes from an internal review. The issues below were found in this release's cod
 - **CLI secrets** can be passed via stdin (`-`) or `GENERATEAPIKEY_SECRET`, `GENERATEAPIKEY_PEPPER` and `GENERATEAPIKEY_TOTP_SECRET`, instead of argv.
 - **CI hardening:**
   - Read-only default permissions.
-  - Publishing moved to PyPI Trusted Publishing in a separate job, triggered on `release: published`.
+  - The release workflow runs the full test suite and `twine check` before uploading.
   - A bandit scan runs on every push.
   - Dependabot is enabled.
   - `SECURITY.md` has been added.
