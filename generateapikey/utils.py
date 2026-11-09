@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import functools
 import hashlib
 import hmac
 import math
@@ -38,12 +39,22 @@ _CHECKSUM_ALPHABET = CHARSETS["base62"]
 def build_charset(charset: str, case: str = "mixed") -> str:
     """Resolve a preset name (or a literal string of characters) and apply ``case``.
 
+    Results are cached (strings are immutable), which roughly halves the cost
+    of ``generate_api_key()`` for repeated calls.
+
     Duplicate characters are removed so every character is equally likely.
     Presets that exclude look-alike characters keep excluding them after a
     case change (e.g. ``base58`` lower-cased never contains ``l``).
     """
     if not isinstance(charset, str):
         raise TypeError("charset must be a string.")
+    if not isinstance(case, str):
+        raise ValueError("case must be one of 'mixed', 'lower', 'upper'.")
+    return _build_charset(charset, case)
+
+
+@functools.lru_cache(maxsize=256)
+def _build_charset(charset: str, case: str) -> str:
     chars = CHARSETS.get(charset, charset)
 
     if case == "lower":

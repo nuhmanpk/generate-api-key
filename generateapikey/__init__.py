@@ -38,7 +38,7 @@ from .utils import (
     verify_checksum,
 )
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = [
     "CHARSETS",
@@ -47,7 +47,11 @@ __all__ = [
     "AttemptLimiter",
     "WeakKeyWarning",
     "__version__",
+    "decode_jwt",
+    "decode_jwt_jwks",
+    "encode_jwt",
     "entropy_bits",
+    "find_keys",
     "generateApiKey",
     "generate_api_key",
     "generate_api_key_async",
@@ -57,11 +61,18 @@ __all__ = [
     "generate_signed_token",
     # MFA (see generateapikey.mfa / generateapikey.tokens)
     "generate_totp_secret",
+    "google_migration_uri",
+    "has_all_scopes",
+    "has_any_scope",
+    "has_scope",
     "hash_api_key",
     "hash_otp",
     "hash_recovery_code",
     "is_expired",
     "is_token_valid",
+    "key_pattern",
+    "parse_scopes",
+    "steam_code",
     "totp_now",
     "totp_uri",
     "verify_api_key",
@@ -69,6 +80,7 @@ __all__ = [
     "verify_otp",
     "verify_recovery_code",
     "verify_signed_token",
+    "verify_steam_code",
     "verify_totp",
 ]
 
@@ -339,12 +351,17 @@ from .mfa import (  # noqa: E402
     generate_otp,
     generate_recovery_codes,
     generate_totp_secret,
+    google_migration_uri,
     hash_otp,
     hash_recovery_code,
+    steam_code,
     totp_now,
     totp_uri,
     verify_otp,
     verify_recovery_code,
+    verify_steam_code,
     verify_totp,
 )
-from .tokens import generate_signed_token, verify_signed_token  # noqa: E402
+from .scanning import find_keys, key_pattern  # noqa: E402
+from .scopes import has_all_scopes, has_any_scope, has_scope, parse_scopes  # noqa: E402
+from .tokens import decode_jwt, decode_jwt_jwks, encode_jwt, generate_signed_token, verify_signed_token  # noqa: E402

@@ -24,7 +24,7 @@ def _imports(text):
 def test_every_documented_import_exists():
     missing = []
     for doc in DOCS:
-        for module, name in _imports(doc.read_text()):
+        for module, name in _imports(doc.read_text(encoding="utf-8")):
             try:
                 mod = importlib.import_module(module)
             except ImportError:
@@ -35,7 +35,7 @@ def test_every_documented_import_exists():
 
 
 def test_every_public_name_is_in_llm_guide():
-    text = GUIDE.read_text()
+    text = GUIDE.read_text(encoding="utf-8")
     skip = {"__version__", "CHECKSUM_LENGTH", "generateApiKey", "is_token_valid"}
     absent = [n for n in generateapikey.__all__ if n not in skip and n not in text]
     assert not absent, absent
@@ -47,5 +47,11 @@ def test_cli_prints_guide(capsys):
 
 
 def test_skill_frontmatter():
-    text = (ROOT / "skills" / "generateapikey" / "SKILL.md").read_text()
+    text = (ROOT / "skills" / "generateapikey" / "SKILL.md").read_text(encoding="utf-8")
     assert text.startswith("---\nname: generateapikey\ndescription: ")
+
+
+def test_cli_prints_agent_rules(capsys):
+    assert cli(["--agent-rules"]) == 0
+    out = capsys.readouterr().out
+    assert "generateapikey" in out and "--llms" in out and out.startswith("## API keys")

@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Optional, Protocol, Union
 
 from .. import ApiKey, generate_api_key
+from ..scopes import has_all_scopes
 from ..utils import CHECKSUM_LENGTH, _check_pepper, hash_api_key, verify_checksum
 
 __all__ = ["APIKeyAuth", "AuthError", "IssuedKey", "issue_api_key", "path_excluded", "record_is_active"]
@@ -143,6 +144,9 @@ class APIKeyAuth:
         on_rehash: ``on_rehash(record, new_hashed)`` is called when a key matched
             under an old pepper, so you can store the new hash. Once every
             active key is re-hashed, drop the old pepper.
+        required_scopes: Scopes every key must hold (checked against the record's
+            ``scopes``; ``read:*`` and ``*`` wildcards work). Failing keys get 403.
+            Override per route with ``authenticate(key, scopes=[...])``.
     """
 
     def __init__(
@@ -160,6 +164,7 @@ class APIKeyAuth:
         on_success: Optional[Callable[[Any], Any]] = None,
         previous_peppers: Sequence[str] = (),
         on_rehash: Optional[Callable[[Any, str], Any]] = None,
+        required_scopes: Sequence[str] = (),
     ):
         if not callable(lookup):
             raise TypeError("lookup must be callable: lookup(hashed) -> record | None")
@@ -182,6 +187,9 @@ class APIKeyAuth:
             _check_pepper(old)
         self.previous_peppers = tuple(previous_peppers)
         self.on_rehash = on_rehash
+        if isinstance(required_scopes, str):
+            raise TypeError("required_scopes must be a sequence of strings, not a string.")
+        self.required_scopes = tuple(required_scopes)
 
     # ------------------------------------------------------------- extraction
 
@@ -226,7 +234,14 @@ class APIKeyAuth:
 
     _BLOCKED = AuthError(429, "Too many invalid API keys. Try again later.")
 
-    def authenticate(self, key: Optional[str], client: Optional[str] = None) -> Any:
+    def _check_scopes(self, record: Any, scopes: Optional[Sequence[str]]) -> None:
+        needed = self.required_scopes if scopes is None else tuple(scopes)
+        if needed and not has_all_scopes(_field(record, "scopes"), needed):
+            raise AuthError(403, "Insufficient scope.")
+
+    def authenticate(
+        self, key: Optional[str], client: Optional[str] = None, scopes: Optional[Sequence[str]] = None
+    ) -> Any:
         """Return the stored record for ``key`` or raise :class:`AuthError`. Sync."""
         limiter = self.limiter if client else None
         if limiter is not None and _sync(limiter.is_blocked(client), "limiter"):
@@ -247,13 +262,16 @@ class APIKeyAuth:
             if limiter is not None:
                 _sync(limiter.fail(client), "limiter")
             raise AuthError(401, "Invalid API key.")
+        self._check_scopes(record, scopes)
         if matched and self.on_rehash is not None:
             self.on_rehash(record, hashes[0])
         if self.on_success is not None:
             self.on_success(record)
         return record
 
-    async def aauthenticate(self, key: Optional[str], client: Optional[str] = None) -> Any:
+    async def aauthenticate(
+        self, key: Optional[str], client: Optional[str] = None, scopes: Optional[Sequence[str]] = None
+    ) -> Any:
         """Async version of :meth:`authenticate`.
 
         ``lookup``, ``on_success``, ``on_rehash`` and the limiter may each be sync or async.
@@ -277,6 +295,7 @@ class APIKeyAuth:
             if limiter is not None:
                 await _maybe_await(limiter.fail(client))
             raise AuthError(401, "Invalid API key.")
+        self._check_scopes(record, scopes)
         if matched and self.on_rehash is not None:
             await _maybe_await(self.on_rehash(record, hashes[0]))
         if self.on_success is not None:

@@ -10,30 +10,37 @@ API keys with prefixes, checksums, expiry and safe storage, plus everything for 
 authenticator apps (TOTP), recovery codes, email/SMS codes and magic links.<br>
 Zero dependencies, fully typed, one function call.
 
-[![PyPI](https://img.shields.io/pypi/v/generateapikey?logo=pypi&logoColor=white&label=pypi)](https://pypi.org/project/generateapikey/)
-[![Python](https://img.shields.io/pypi/pyversions/generateapikey?logo=python&logoColor=white)](https://pypi.org/project/generateapikey/)
-[![Downloads](https://static.pepy.tech/personalized-badge/generateapikey?period=total&units=abbreviation&left_color=grey&right_color=orange&left_text=downloads)](https://pepy.tech/project/generateapikey)
-[![Downloads/month](https://img.shields.io/pypi/dm/generateapikey?label=downloads%2Fmonth)](https://pypi.org/project/generateapikey/)
-[![License](https://img.shields.io/github/license/nuhmanpk/generate-api-key?color=yellow)](LICENSE)
+**Trusted by developers** (see the live download badges below).
 
-[![Tests](https://github.com/nuhmanpk/generate-api-key/actions/workflows/tests.yml/badge.svg)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/tests.yml)
-[![Upload to PIP](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml/badge.svg)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml)
-![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
-![Typed](https://img.shields.io/badge/typing-typed-blue)
-![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)
+[![PyPI](https://img.shields.io/pypi/v/generateapikey?logo=pypi&logoColor=white&label=pypi)](https://pypi.org/project/generateapikey/) [![Python](https://img.shields.io/pypi/pyversions/generateapikey?logo=python&logoColor=white)](https://pypi.org/project/generateapikey/) [![Downloads](https://static.pepy.tech/personalized-badge/generateapikey?period=total&units=abbreviation&left_color=grey&right_color=orange&left_text=downloads)](https://pepy.tech/project/generateapikey) [![Downloads/month](https://img.shields.io/pypi/dm/generateapikey?label=downloads%2Fmonth)](https://pypi.org/project/generateapikey/) [![License](https://img.shields.io/github/license/nuhmanpk/generate-api-key?color=yellow)](LICENSE)
 
-[![Stars](https://img.shields.io/github/stars/nuhmanpk/generate-api-key?logo=github)](https://github.com/nuhmanpk/generate-api-key/stargazers)
-[![Forks](https://img.shields.io/github/forks/nuhmanpk/generate-api-key?logo=github)](https://github.com/nuhmanpk/generate-api-key/network/members)
-[![Issues](https://img.shields.io/github/issues/nuhmanpk/generate-api-key?logo=github)](https://github.com/nuhmanpk/generate-api-key/issues)
-[![Last commit](https://img.shields.io/github/last-commit/nuhmanpk/generate-api-key)](https://github.com/nuhmanpk/generate-api-key/commits/main)
-![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+[![Tests](https://github.com/nuhmanpk/generate-api-key/actions/workflows/tests.yml/badge.svg)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/tests.yml) [![Upload to PIP](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml/badge.svg)](https://github.com/nuhmanpk/generate-api-key/actions/workflows/pypi-upload.yml) ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![Typed](https://img.shields.io/badge/typing-typed-blue) ![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)
 
-[![Sponsor](https://img.shields.io/badge/sponsor-nuhmanpk-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/nuhmanpk)
-[![Buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-nuhmanpk-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/nuhmanpk)
+[![Stars](https://img.shields.io/github/stars/nuhmanpk/generate-api-key?logo=github)](https://github.com/nuhmanpk/generate-api-key/stargazers) [![Forks](https://img.shields.io/github/forks/nuhmanpk/generate-api-key?logo=github)](https://github.com/nuhmanpk/generate-api-key/network/members) [![Issues](https://img.shields.io/github/issues/nuhmanpk/generate-api-key?logo=github)](https://github.com/nuhmanpk/generate-api-key/issues) [![Last commit](https://img.shields.io/github/last-commit/nuhmanpk/generate-api-key)](https://github.com/nuhmanpk/generate-api-key/commits/main) ![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+
+[![Sponsor](https://img.shields.io/badge/sponsor-nuhmanpk-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/nuhmanpk) [![Buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-nuhmanpk-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/nuhmanpk)
 
 </div>
 
 ---
+
+## See it in action
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/assets/tour.svg" alt="Animated tour: generate a key, validate its checksum, hash it for storage, verify it in constant time, then protect logins with TOTP" width="800">
+
+</div>
+
+## Built for AI coding agents
+
+If you code with an AI assistant (Claude Code, Cursor, Copilot, Codex, Windsurf), point it at this library so it stops hand-rolling key and 2FA code. One command prints a rules snippet to paste into `AGENTS.md`, `CLAUDE.md` or `.cursor/rules`:
+
+```bash
+generate-api-key --agent-rules >> AGENTS.md
+```
+
+It tells the agent to use generateapikey (instead of ad-hoc `secrets`/`random`/`uuid` code) for API keys, 2FA/TOTP, recovery codes, magic links and JWTs, and to read `generate-api-key --llms` rather than guess the API. See [For AI coding agents](#for-ai-coding-agents) for the full list of files agents can read.
 
 ## Install
 
@@ -73,21 +80,103 @@ generate-api-key --hash --json            # key + storage hash as JSON
 - **Works with your framework**: drop-in API key auth for FastAPI, Django, DRF, Flask, Starlette, Litestar, Sanic, aiohttp, Quart and Falcon.
 - **Zero dependencies**: standard library only, fully typed (`py.typed`). QR codes and framework adapters are optional extras.
 
+## Comparison
+
+generateapikey bundles what usually takes several packages. ✅ = built in, ❌ = not provided by that library (you'd add another one).
+
+| Feature | **generateapikey** | secrets | pyotp | itsdangerous | PyJWT | drf-api-key | nanoid |
+|---|---|---|---|---|---|---|---|
+| Secure random keys | **✅** | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Unbiased custom alphabet | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Prefix | **✅** | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Checksum (offline typo/leak detection) | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Hash + constant-time verify | **✅** | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Key expiry | **✅** | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ |
+| Key / pepper rotation | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Derived keys (secret + seed) | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| TOTP / HOTP (RFC 4226/6238) | **✅** | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| otpauth:// URI + QR code | **✅** | ❌ | URI only | ❌ | ❌ | ❌ | ❌ |
+| Recovery codes | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Email / SMS one-time codes | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Signed expiring tokens (magic links) | **✅** | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ |
+| Standard JWT (HS256/384/512) | **✅** | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Asymmetric JWT (RS/PS/ES/EdDSA) + JWKS | **✅ (`crypto` extra)** | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Key scopes (`read:*` wildcards) | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Built-in key store (revoke, rotate, last-used) | **✅** | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| Leak-detection regex (gitleaks / secret scanning) | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Steam Guard + Google Authenticator import | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Encrypted secrets at rest (AES-GCM) | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Brute-force attempt limiter (+ Redis) | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Framework adapters | **10 frameworks** | ❌ | ❌ | ❌ | ❌ | Django / DRF | ❌ |
+| CLI | **✅** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Zero runtime dependencies | **✅** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+
+Where it isn't the right tool: JWE (encrypted JWTs), JWKS fetching/caching and OAuth flows still need other libraries, and a bare `secrets.token_urlsafe(32)` is the fastest way to get an unconstrained random string.
+
+### Speed
+
+Measured with [`benchmarks/compare.py`](benchmarks/compare.py) (CPython 3.11, macOS, best of 5, 20,000 calls each). Your numbers will differ; the ranking is what matters. Lower is better.
+
+**Generate a key**
+
+| Library / call | µs per op | ops/s | vs fastest |
+|---|--:|--:|--:|
+| `secrets.token_urlsafe(32)` | 2.45 | 408,327 | 1.0× |
+| **generateapikey `generate_api_key()`** | **2.81** | **356,445** | **1.1×** |
+| **generateapikey `generate_api_key(prefix, checksum)`** | **4.22** | **237,152** | **1.7×** |
+| `nanoid.generate()` | 4.56 | 219,369 | 1.9× |
+| `shortuuid.uuid()` | 5.57 | 179,691 | 2.3× |
+| `secrets.choice` loop (32 chars) | 42.81 | 23,358 | 17.5× |
+
+**Verify a stored key**
+
+| Library / call | µs per op | ops/s | vs fastest |
+|---|--:|--:|--:|
+| **generateapikey `verify_api_key`** | **5.32** | **188,040** | **1.0×** |
+
+**TOTP**
+
+| Library / call | µs per op | ops/s | vs fastest |
+|---|--:|--:|--:|
+| pyotp `provisioning_uri` | 6.03 | 165,794 | 1.0× |
+| **generateapikey `totp_uri`** | **8.71** | **114,837** | **1.4×** |
+| pyotp `TOTP.verify` | 22.37 | 44,712 | 3.7× |
+| **generateapikey `verify_totp`** | **22.64** | **44,171** | **3.8×** |
+
+**Signed, expiring tokens**
+
+| Library / call | µs per op | ops/s | vs fastest |
+|---|--:|--:|--:|
+| **generateapikey `verify_signed_token`** | **9.68** | **103,331** | **1.0×** |
+| **generateapikey `generate_signed_token`** | **10.91** | **91,656** | **1.1×** |
+| itsdangerous `loads` | 12.76 | 78,359 | 1.3× |
+| itsdangerous `dumps` | 14.34 | 69,740 | 1.5× |
+| PyJWT `encode` (HS256) | 20.82 | 48,040 | 2.2× |
+| PyJWT `decode` (HS256) | 32.31 | 30,946 | 3.3× |
+
+Reading the numbers:
+
+- `secrets.token_urlsafe` is still a bit faster (1.1–1.7× across runs) because it only base64-encodes random bytes. It can't do custom alphabets, prefixes or checksums, and it isn't unbiased over an alphabet like base62. Against the equivalent per-character `secrets.choice` loop, generateapikey is roughly 15–25× faster, and it beats nanoid and shortuuid.
+- TOTP verification matches pyotp (generateapikey also rejects malformed input and checks the adjacent window without early exit).
+- Signed tokens are faster than itsdangerous and PyJWT here, and `verify_signed_token` also enforces purpose binding.
+
+Reproduce: `pip install pyotp itsdangerous pyjwt shortuuid nanoid && python benchmarks/compare.py --markdown`.
+
 ## Recipes
 
 ```python
 from generateapikey import generate_api_key
 
-generate_api_key(length=48)  # longer key
-generate_api_key(prefix="sk")  # 'sk-gRsNbb2lQ1cZxoT3...'
-generate_api_key(prefix="sk_live", separator="_")  # 'sk_live_gRsNbb2l...'
-generate_api_key(dashes=True)  # 'GdBA-6DhM-M3Fv-g99C-...'
-generate_api_key(charset="hex", length=32)  # hex only
-generate_api_key(charset="base58")  # no look-alike 0/O/I/l
-generate_api_key(charset="ABC123", length=10)  # your own alphabet
-generate_api_key(case="upper", charset="alphabetic")
-generate_api_key(prefix="sk", checksum=True)  # self-validating key
-generate_api_key(expiry=60)  # expires in 60 minutes
+generate_api_key(length=48)  # 'nEWkMHMjcqzM25J2A1LsFS8PHK9yRsCxGCXLUPIRI25GhVK9'  longer key
+generate_api_key(prefix="sk")  # 'sk-NMebYJWi5tqZerAkCbGzmeaBl4KbqGic'
+generate_api_key(prefix="myapp_live", separator="_")  # 'myapp_live_wDXrsqS5mGjknqXMhr3ecGhl0b4FpyRi'
+generate_api_key(dashes=True)  # 'AEpx-VKcN-PGm5-hYtf-rCC7-lcY3-yxve-XbiN'
+generate_api_key(charset="hex", length=32)  # '907b2d87ddf40faf8785a7426d921441'  hex only
+generate_api_key(charset="base58")  # 'RV9cXiBGScEdRcn4Nwu7py1oGRKKswys'  no look-alike 0/O/I/l
+generate_api_key(charset="ABC123", length=10)  # 'B11322C13A'  your own alphabet (short: warns about low entropy)
+generate_api_key(case="upper", charset="alphabetic")  # 'IYGLHELTLVFSXALTKGJKJOCJWWLBGMWZ'
+generate_api_key(prefix="sk", checksum=True)  # 'sk-oTP7GmTSNeTOgyDuwpEjUvsZrcmHinT60mOs7L'  self-validating key
+generate_api_key(expiry=60)  # 'ZX06sSdK7iz4Eg5o0RKVvfQywBKQcma1'  expires in 60 minutes (key.expires_at)
 ```
 
 Need many keys at once:
@@ -96,6 +185,45 @@ Need many keys at once:
 from generateapikey import generate_api_keys
 
 keys = generate_api_keys(1000, prefix="sk", length=40)
+```
+
+## Scopes, key store and leak detection
+
+**Scopes.** Give keys permissions and check them per route. Wildcards work (`read:*`, `*`).
+
+```python
+from generateapikey import has_scope
+from generateapikey.integrations import APIKeyAuth
+
+has_scope(["read:*"], "read:users")  # True
+auth = APIKeyAuth(lookup, pepper=PEPPER, required_scopes=["read:users"])  # valid key without the scope: 403
+auth.authenticate(key, scopes=["write:users"])  # per-route override
+```
+
+**Key store.** A zero-dependency SQLite store with hashing, scopes, expiry, revoke, last-used and rotation. It plugs straight into `APIKeyAuth` and every framework adapter.
+
+```python
+from generateapikey.keystore import KeyStore
+
+store = KeyStore("keys.db", pepper=PEPPER)
+made = store.create("ci-bot", scopes=["read:*"], prefix="sk", expiry=60 * 24 * 90)  # minutes
+made.key  # show once; only the hash is stored
+auth = APIKeyAuth(store.lookup, pepper=PEPPER)
+new = store.rotate(made.id, grace_minutes=24 * 60)  # the old key keeps working for 24 h
+store.revoke(new.id)
+```
+
+Use `rotate_api_key(...)` for the same logic with your own database.
+
+**Leak detection.** Keys with a prefix and checksum are easy for secret scanners to find, and the checksum removes false positives.
+
+```python
+from generateapikey import find_keys, key_pattern
+from generateapikey.scanning import gitleaks_rule
+
+key_pattern("sk")  # regex to paste into GitHub secret scanning / trufflehog
+find_keys(log_text, "sk")  # only strings with a valid checksum
+print(gitleaks_rule("sk", "acme-api-key"))  # [[rules]] block for .gitleaks.toml
 ```
 
 ## Storing keys safely
@@ -498,6 +626,37 @@ verify_signed_token(token, SECRET, purpose="login", context=request.session.sess
 
 `context` is signed but never put in the token. Bind to a session or device cookie, not an IP address, since mobile IPs change.
 
+### Standard JWTs
+
+For interoperability with other services, `encode_jwt` / `decode_jwt` read and write standard JWTs (RFC 7519): HS256/384/512 with a shared secret, and RS/PS/ES 256-384-512 or EdDSA with PEM keys, plus JWKS verification (`pip install "generateapikey[crypto]"`). Tokens interoperate with PyJWT in both directions. The accepted algorithms are pinned by you, never taken from the token header, `alg: none` is always rejected, and HS* and RS*/ES* can't be mixed in one `decode_jwt` call (that blocks algorithm-confusion attacks).
+
+```python
+from generateapikey import encode_jwt, decode_jwt
+
+token = encode_jwt({"sub": "42"}, SECRET, expiry=15, issuer="myapp", audience="api")
+claims = decode_jwt(token, SECRET, issuer="myapp", audience="api")  # dict, or None if invalid/expired
+
+# Asymmetric: sign with the private PEM, verify anywhere with the public PEM
+token = encode_jwt({"sub": "42"}, PRIVATE_PEM, algorithm="ES256")
+claims = decode_jwt(token, PUBLIC_PEM, algorithms=("ES256",))
+
+# RS/PS 256-384-512 and EdDSA work too. Verify against a JWKS (kid only selects among keys you trust):
+from generateapikey import decode_jwt_jwks
+
+claims = decode_jwt_jwks(token, jwks, algorithms=("RS256",), audience="api")
+```
+
+### Steam Guard codes and Google Authenticator import
+
+```python
+from generateapikey import google_migration_uri, steam_code, verify_steam_code
+
+steam_code(secret)  # 5-character Steam Guard style code
+verify_steam_code(secret, "K7BQ2")  # True/False
+google_migration_uri([{"secret": secret, "name": "alice@example.com", "issuer": "MyApp"}])
+# otpauth-migration:// URI: render it as a QR code so users can import into Google Authenticator
+```
+
 ### Encrypting TOTP secrets at rest
 
 TOTP secrets can't be hashed, because the server needs them to compute codes, so encrypt them (`pip install "generateapikey[crypto]"`):
@@ -609,6 +768,11 @@ key = await generate_api_key_async(length=48, prefix="sk")
 | `generate_recovery_codes()` / `hash_recovery_code()` / `verify_recovery_code()` | Single-use backup codes. |
 | `generate_otp()` / `hash_otp()` / `verify_otp()` | Email/SMS one-time codes (salted PBKDF2). |
 | `generate_signed_token()` / `verify_signed_token()` | Magic links, email verification, password resets. |
+| `encode_jwt()` / `decode_jwt()` / `decode_jwt_jwks()` | Standard JWTs: HS*, plus RS/PS/ES and EdDSA with the `crypto` extra, and JWKS verification. Algorithms pinned by the caller. |
+| `has_scope()` / `has_all_scopes()` / `has_any_scope()` / `parse_scopes()` | Key scopes with `read:*` wildcards. |
+| `key_pattern()` / `find_keys()` | Regex and finder for leaked keys; `scanning.gitleaks_rule()` for gitleaks. |
+| `steam_code()` / `verify_steam_code()` / `google_migration_uri()` | Steam Guard codes; Google Authenticator import URI. |
+| `keystore.KeyStore` / `keystore.rotate_api_key()` | SQLite key store; grace-period rotation helper. |
 | `AttemptLimiter` | Brute-force guard for code checks. |
 | `qr.qr_svg()` / `qr.qr_png()` / `qr.qr_ascii()` | QR codes (needs the `[qr]` extra). |
 | `ApiKey` | `str` subclass with `expires_at`, `expires_in`, `expires_at_datetime`, `is_expired`, `.hash()`. |
@@ -645,7 +809,9 @@ This library is set up so coding agents (Claude Code, Cursor, Copilot, Codex and
 | [`AGENTS.md`](AGENTS.md) | Conventions for agents contributing to this repo. |
 | [`context7.json`](context7.json) | Lets agents fetch the docs through the [Context7](https://context7.com) MCP server. |
 
-Tip: add `Use generateapikey for API keys and MFA (run "generate-api-key --llms" for its API).` to your project's `AGENTS.md` or `CLAUDE.md`.
+**Where agents should look things up** (in this order): the installed version (`generate-api-key --llms`, `generateapikey.__all__`, `help(function)`), then the guide above, then this README, then the [CHANGELOG](CHANGELOG.md) for renames and breaking changes. If a name isn't in `__all__` or the guide, it doesn't exist. Don't rely on training data: the package was renamed in 0.5.0 and has grown since.
+
+Tip: run `generate-api-key --agent-rules >> AGENTS.md`, or add `Use generateapikey for API keys and MFA (run "generate-api-key --llms" for its API).` to your project's `AGENTS.md` or `CLAUDE.md`.
 
 ## Security notes
 
@@ -662,7 +828,8 @@ Tip: add `Use generateapikey for API keys and MFA (run "generate-api-key --llms"
 
 - [`examples/fastapi_app.py`](examples/fastapi_app.py): a complete app with API keys, TOTP 2FA (encrypted secrets, replay protection), recovery codes and session-bound magic links. CI runs it end to end.
 - [`examples/django_quickstart.md`](examples/django_quickstart.md): model, settings, views, DRF and key rotation.
-- [`benchmarks/bench.py`](benchmarks/bench.py): `python benchmarks/bench.py`. Key generation runs about 23× faster than a `secrets.choice` loop (≈1 µs vs 24 µs for 32 characters).
+- [`benchmarks/compare.py`](benchmarks/compare.py): head-to-head against `secrets`, pyotp, itsdangerous, PyJWT, shortuuid and nanoid.
+- [`benchmarks/bench.py`](benchmarks/bench.py): `python benchmarks/bench.py`. Key generation runs roughly 15–25× faster than a `secrets.choice` loop.
 
 ## Contributing
 
@@ -679,8 +846,7 @@ Tested on Python 3.9–3.14 with every framework. The core is checked with stric
 
 If this saves you time, consider supporting the project:
 
-<a href="https://buymeacoffee.com/nuhmanpk"><img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-nuhmanpk-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy me a coffee"></a>
-<a href="https://github.com/sponsors/nuhmanpk"><img src="https://img.shields.io/badge/Sponsor-nuhmanpk-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
+<a href="https://buymeacoffee.com/nuhmanpk"><img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-nuhmanpk-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy me a coffee"></a> <a href="https://github.com/sponsors/nuhmanpk"><img src="https://img.shields.io/badge/Sponsor-nuhmanpk-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="GitHub Sponsors"></a>
 
 ## License
 

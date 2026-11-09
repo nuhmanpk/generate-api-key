@@ -32,17 +32,20 @@ __all__ = [
     "generate_otp",
     "generate_recovery_codes",
     "generate_totp_secret",
+    "google_migration_uri",
     "hash_otp",
     "hash_recovery_code",
     "hotp",
     "hotp_uri",
     "normalize_recovery_code",
+    "steam_code",
     "totp",
     "totp_now",
     "totp_uri",
     "verify_hotp",
     "verify_otp",
     "verify_recovery_code",
+    "verify_steam_code",
     "verify_totp",
 ]
 
@@ -190,6 +193,82 @@ def find_totp_step(
 def verify_totp(secret: Union[str, bytes], code: object, **options: Any) -> bool:
     """True if ``code`` is valid now. Options as :func:`find_totp_step`."""
     return find_totp_step(secret, code, **options) is not None
+
+
+_STEAM_ALPHABET = "23456789BCDFGHJKMNPQRTVWXY"
+
+
+def steam_code(secret: Union[str, bytes], at: Optional[float] = None) -> str:
+    """Steam Guard style 5-character code (HMAC-SHA1, 30 s steps, Steam's alphabet)."""
+    t = time.time() if at is None else at
+    mac = hmac.new(_decode_secret(secret), struct.pack(">Q", int(t // 30)), hashlib.sha1).digest()
+    offset = mac[-1] & 0x0F
+    value = struct.unpack(">I", mac[offset : offset + 4])[0] & 0x7FFFFFFF
+    out = []
+    for _ in range(5):
+        value, rem = divmod(value, 26)
+        out.append(_STEAM_ALPHABET[rem])
+    return "".join(out)
+
+
+def verify_steam_code(secret: Union[str, bytes], code: object, *, window: int = 1, at: Optional[float] = None) -> bool:
+    """True if a Steam Guard style ``code`` is valid now (case-insensitive, no early exit)."""
+    if not isinstance(code, str) or len(code) != 5:
+        return False
+    t = time.time() if at is None else at
+    ok = False
+    for step in range(-window, window + 1):
+        if safe_equals(steam_code(secret, t + step * 30), code.upper()):
+            ok = True
+    return ok
+
+
+def _varint(n: int) -> bytes:
+    out = bytearray()
+    while True:
+        b = n & 0x7F
+        n >>= 7
+        out.append(b | (0x80 if n else 0))
+        if not n:
+            return bytes(out)
+
+
+def _field_bytes(num: int, data: bytes) -> bytes:
+    return _varint(num << 3 | 2) + _varint(len(data)) + data
+
+
+def _field_int(num: int, value: int) -> bytes:
+    return _varint(num << 3) + _varint(value)
+
+
+def google_migration_uri(accounts: Iterable[dict[str, Any]]) -> str:
+    """``otpauth-migration://`` URI that Google Authenticator can import (as a QR code).
+
+    ``accounts``: dicts with ``secret`` (base32), ``name`` and optional
+    ``issuer``, ``digits`` (6 or 8), ``algorithm`` (sha1/sha256/sha512). All are TOTP.
+    Keep the URI private: it contains the secrets. Large batches should be split
+    into several URIs, since one QR code holds only so much.
+    """
+    algs = {"sha1": 1, "sha256": 2, "sha512": 3}
+    params = b""
+    for acc in accounts:
+        digits = int(acc.get("digits", 6))
+        alg = str(acc.get("algorithm", "sha1")).lower()
+        if digits not in (6, 8) or alg not in algs:
+            raise ValueError("digits must be 6 or 8; algorithm must be sha1, sha256 or sha512.")
+        item = (
+            _field_bytes(1, _decode_secret(acc["secret"]))
+            + _field_bytes(2, str(acc["name"]).encode())
+            + _field_bytes(3, str(acc.get("issuer", "")).encode())
+            + _field_int(4, algs[alg])
+            + _field_int(5, 1 if digits == 6 else 2)
+            + _field_int(6, 2)
+        )
+        params += _field_bytes(1, item)
+    if not params:
+        raise ValueError("accounts must not be empty.")
+    payload = params + _field_int(2, 1) + _field_int(3, 1) + _field_int(4, 0) + _field_int(5, secrets.randbits(31))
+    return "otpauth-migration://offline?data=" + quote(base64.b64encode(payload).decode(), safe="")
 
 
 def verify_hotp(
