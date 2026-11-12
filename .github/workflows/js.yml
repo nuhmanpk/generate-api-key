@@ -1,0 +1,100 @@
+name: JavaScript
+on:
+  push:
+    branches: [main]
+    paths:
+      - "js/**"
+      - "spec/**"
+      - ".github/workflows/js.yml"
+  pull_request:
+    paths:
+      - "js/**"
+      - "spec/**"
+      - ".github/workflows/js.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: js
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["22", "24"]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test           # node + edge-runtime projects, incl. spec/vectors.json
+      - run: npm run build
+      - run: npm run test:smoke
+
+  runtimes:
+    # The built package on runtimes vitest doesn't cover.
+    name: runtime (${{ matrix.runtime }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node20, bun, deno, workers]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/setup-node@v7      # switch to Node 20 to run the built package there
+        if: matrix.runtime == 'node20'
+        with:
+          node-version: "20"
+      - uses: oven-sh/setup-bun@v2
+        if: matrix.runtime == 'bun'
+      - uses: denoland/setup-deno@v2
+        if: matrix.runtime == 'deno'
+        with:
+          deno-version: v2.x
+      - run: node test/smoke.mjs
+        if: matrix.runtime == 'node20'
+      - run: bun test/smoke.mjs
+        if: matrix.runtime == 'bun'
+      - run: deno run --no-config --allow-read=.. test/smoke.mjs
+        if: matrix.runtime == 'deno'
+      - run: node test/workers.mjs
+        if: matrix.runtime == 'workers'
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint:package          # publint + are-the-types-wrong
+      - name: no test fixtures, keys or sources in the tarball
+        run: |
+          npm pack --dry-run --json > pack.json
+          node -e '
+            const j = require("./pack.json"); const files = (Array.isArray(j) ? j[0] : Object.values(j)[0]).files.map((f) => f.path);
+            const bad = files.filter((f) => !/^(dist\/|llms\.txt$|README\.md$|CHANGELOG\.md$|LICENSE$|package\.json$)/.test(f) || /\.pem$|PRIVATE/.test(f));
+            console.log(files.length, "files"); if (bad.length) { console.error("unexpected:", bad); process.exit(1); }'

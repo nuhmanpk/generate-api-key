@@ -7,7 +7,7 @@ description: Generate, store, verify and protect API keys and add MFA/JWT in Pyt
 
 Use the `generateapikey` package (`pip install generateapikey`; QR codes need `"generateapikey[qr]"`). Import it as lowercase `generateapikey`.
 
-To get the complete API for the installed version, run `generate-api-key --llms`, or read https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/generateapikey/llms-full.txt.
+To get the complete API for the installed version, run `generate-api-key --llms`, or read https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/python/generateapikey/llms-full.txt.
 
 ## Verify before you write code
 

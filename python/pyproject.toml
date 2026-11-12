@@ -59,11 +59,11 @@ generateapikey = "generateapikey.__main__:main"
 
 [project.urls]
 Homepage = "https://github.com/nuhmanpk/generate-api-key"
-Documentation = "https://github.com/nuhmanpk/generate-api-key/blob/main/README.md"
+Documentation = "https://github.com/nuhmanpk/generate-api-key/blob/main/python/README.md"
 Source = "https://github.com/nuhmanpk/generate-api-key"
 Tracker = "https://github.com/nuhmanpk/generate-api-key/issues"
-Changelog = "https://github.com/nuhmanpk/generate-api-key/blob/main/CHANGELOG.md"
-"LLM docs" = "https://github.com/nuhmanpk/generate-api-key/blob/main/llms.txt"
+Changelog = "https://github.com/nuhmanpk/generate-api-key/blob/main/python/CHANGELOG.md"
+"LLM docs" = "https://github.com/nuhmanpk/generate-api-key/blob/main/python/llms.txt"
 Funding = "https://github.com/sponsors/nuhmanpk"
 "Buy me a coffee" = "https://buymeacoffee.com/nuhmanpk"
 
@@ -97,6 +97,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "examples/*" = ["B008"]  # FastAPI Depends() idiom
+"scripts/*" = ["S101"]  # the vector generator asserts its own invariants
 "tests/*" = ["S101", "S105", "S106", "S301", "S311", "S603", "PLR0915", "B008", "B018", "B023", "E402", "F811", "PLW0108", "RUF012", "RUF059", "RET", "SIM117"]
 
 [tool.mypy]

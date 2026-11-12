@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+No change to the package's API or behaviour.
+
+### Repository
+- The repository is now a monorepo: this package lives in `python/`, and its JavaScript/TypeScript
+  sibling is published to npm as [`@nuhmanpk/generateapikey`](https://www.npmjs.com/package/@nuhmanpk/generateapikey)
+  under the same version number. Both are wire-compatible: keys, hashes, codes, tokens, JWTs and
+  ciphertexts made in one language verify in the other.
+- `spec/SPEC.md` documents every format and algorithm (spec v1). `spec/vectors.json` is generated
+  from this package by `scripts/gen_vectors.py`, and `tests/test_vectors.py` runs it. CI fails if
+  the file is out of date. `scripts/interop.py` checks values made by the JS package.
+- Releases are tag-driven (`py-v*`) and published with PyPI Trusted Publishing.
+- README links are absolute, so they also work on the PyPI page.
+
+### Notes found while writing the spec (not changed, documented in `spec/SPEC.md`)
+- `decode_jwt` decodes base64url leniently, so a signature with characters outside the alphabet
+  inserted, or with `+`/`/`, can still verify. This is not a forgery: the signature bytes must
+  still be correct.
+- `decode_jwt_jwks` raises `ValueError` instead of returning `None` when a token without a `kid`
+  meets a JWKS that also contains a key of another type.
+
 ## 0.6.0
 
 ### Added

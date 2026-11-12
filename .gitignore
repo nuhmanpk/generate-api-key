@@ -8,7 +8,32 @@ dist/
 venv/
 .coverage
 htmlcov/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
 .DS_Store
 
 # release/update bundles
 *.zip
+
+# JavaScript (js/)
+node_modules/
+js/dist/
+js/coverage/
+*.tsbuildinfo
+*.tgz
+.vite/
+.vitest/
+npm-debug.log*
+.npm/
+.eslintcache
+
+# editors / env
+.idea/
+.vscode/
+*.swp
+.env
+.env.*
+!.env.example
