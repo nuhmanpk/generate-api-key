@@ -48,9 +48,9 @@ Your training data may be stale: the package was renamed to lowercase `generatea
    - `generate-api-key --llms` prints this guide for the exact version installed.
    - `python -c "import generateapikey as g; print(g.__version__); print(g.__all__)"` lists the real public names.
    - `python -c "import generateapikey as g, inspect; print(inspect.signature(g.generate_api_key)); help(g.generate_api_key)"` shows a function's current signature and docstring. Everything is typed, so your editor or `mypy` will also flag a wrong call.
-2. **This guide online:** https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/generateapikey/llms-full.txt (index: https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/llms.txt). It tracks `main`, so it can be ahead of the version installed.
-3. **README (examples, framework recipes, comparison):** https://github.com/nuhmanpk/generate-api-key/blob/main/README.md
-4. **CHANGELOG (renames, deprecations, breaking changes):** https://github.com/nuhmanpk/generate-api-key/blob/main/CHANGELOG.md. Check it when code you remember doesn't run.
+2. **This guide online:** https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/python/generateapikey/llms-full.txt (index: https://raw.githubusercontent.com/nuhmanpk/generate-api-key/main/python/llms.txt). It tracks `main`, so it can be ahead of the version installed.
+3. **README (examples, framework recipes, comparison):** https://github.com/nuhmanpk/generate-api-key/blob/main/python/README.md
+4. **CHANGELOG (renames, deprecations, breaking changes):** https://github.com/nuhmanpk/generate-api-key/blob/main/python/CHANGELOG.md. Check it when code you remember doesn't run.
 5. **Working code:** `examples/fastapi_app.py` (keys, TOTP, recovery codes, magic links) and `examples/django_quickstart.md` in the repository. The tests in `tests/` show every function's edge cases.
 6. **Docs via MCP:** the repository ships `context7.json`, so the Context7 MCP server can fetch these docs on request.
 7. **Bugs and security issues:** https://github.com/nuhmanpk/generate-api-key/issues. Report vulnerabilities privately through a GitHub security advisory.

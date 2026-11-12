@@ -1,0 +1,42 @@
+name: Release (npm)
+# Push a tag like js-v0.6.1 to publish with npm provenance.
+# Needs an npm automation token in the repository secret NPM_TOKEN, or npm
+# Trusted Publishing configured for this workflow (then the token is unused).
+on:
+  push:
+    tags: ["js-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/@nuhmanpk/generateapikey
+    permissions:
+      contents: read
+      id-token: write   # npm provenance
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+      - name: tag matches package version
+        run: test "js-v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run test:smoke
+      - run: npm run lint:package
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

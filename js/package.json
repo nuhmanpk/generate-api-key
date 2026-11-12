@@ -1,0 +1,177 @@
+{
+  "name": "@nuhmanpk/generateapikey",
+  "version": "0.6.0",
+  "description": "Secure API keys and MFA with zero dependencies, on Web Crypto: keys, checksums, hashing, scopes, rotation, TOTP/HOTP, recovery codes, OTPs, signed tokens, JWT (HS/RS/PS/ES/EdDSA), AES-GCM secrets, QR codes, and API key auth for Hono, Express, Fastify, Koa, Next.js and any fetch handler. Wire-compatible with the Python package.",
+  "keywords": [
+    "api key",
+    "api-key",
+    "apikey",
+    "token",
+    "secret",
+    "security",
+    "authentication",
+    "mfa",
+    "2fa",
+    "totp",
+    "hotp",
+    "otp",
+    "recovery codes",
+    "magic link",
+    "jwt",
+    "webcrypto",
+    "edge",
+    "cloudflare-workers",
+    "deno",
+    "bun",
+    "hono",
+    "express",
+    "fastify",
+    "koa",
+    "nextjs"
+  ],
+  "license": "MIT",
+  "author": "Nuhman Pk",
+  "homepage": "https://github.com/nuhmanpk/generate-api-key/tree/main/js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nuhmanpk/generate-api-key.git",
+    "directory": "js"
+  },
+  "bugs": "https://github.com/nuhmanpk/generate-api-key/issues",
+  "funding": "https://github.com/sponsors/nuhmanpk",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./qr": {
+      "import": {
+        "types": "./dist/qr.d.ts",
+        "default": "./dist/qr.js"
+      },
+      "require": {
+        "types": "./dist/qr.d.cts",
+        "default": "./dist/qr.cjs"
+      }
+    },
+    "./web": {
+      "import": {
+        "types": "./dist/integrations/web.d.ts",
+        "default": "./dist/integrations/web.js"
+      },
+      "require": {
+        "types": "./dist/integrations/web.d.cts",
+        "default": "./dist/integrations/web.cjs"
+      }
+    },
+    "./hono": {
+      "import": {
+        "types": "./dist/integrations/hono.d.ts",
+        "default": "./dist/integrations/hono.js"
+      },
+      "require": {
+        "types": "./dist/integrations/hono.d.cts",
+        "default": "./dist/integrations/hono.cjs"
+      }
+    },
+    "./express": {
+      "import": {
+        "types": "./dist/integrations/express.d.ts",
+        "default": "./dist/integrations/express.js"
+      },
+      "require": {
+        "types": "./dist/integrations/express.d.cts",
+        "default": "./dist/integrations/express.cjs"
+      }
+    },
+    "./fastify": {
+      "import": {
+        "types": "./dist/integrations/fastify.d.ts",
+        "default": "./dist/integrations/fastify.js"
+      },
+      "require": {
+        "types": "./dist/integrations/fastify.d.cts",
+        "default": "./dist/integrations/fastify.cjs"
+      }
+    },
+    "./koa": {
+      "import": {
+        "types": "./dist/integrations/koa.d.ts",
+        "default": "./dist/integrations/koa.js"
+      },
+      "require": {
+        "types": "./dist/integrations/koa.d.cts",
+        "default": "./dist/integrations/koa.cjs"
+      }
+    },
+    "./next": {
+      "import": {
+        "types": "./dist/integrations/next.d.ts",
+        "default": "./dist/integrations/next.js"
+      },
+      "require": {
+        "types": "./dist/integrations/next.d.cts",
+        "default": "./dist/integrations/next.cjs"
+      }
+    },
+    "./llms.txt": "./llms.txt",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "generate-api-key": "dist/cli.js",
+    "generateapikey": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "llms.txt",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:edge": "vitest run --project edge",
+    "test:smoke": "node test/smoke.mjs",
+    "lint:package": "publint --strict && attw --pack . --profile node16 --exclude-entrypoints llms.txt",
+    "bench": "node bench/bench.mjs",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test && npm run test:smoke && npm run lint:package",
+    "test:workers": "node test/workers.mjs",
+    "test:runtimes": "node test/smoke.mjs && node test/workers.mjs"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@edge-runtime/vm": "^5.0.0",
+    "@types/express": "^5.0.6",
+    "@types/koa": "^3.0.3",
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.28.2",
+    "express": "^5.3.0",
+    "fastify": "^5.12.8",
+    "hono": "^4.13.18",
+    "koa": "^3.3.0",
+    "miniflare": "^4.20260730.0",
+    "publint": "^0.3.25",
+    "tsup": "^9.0.0",
+    "typescript": "~5.9.3",
+    "vitest": "^5.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

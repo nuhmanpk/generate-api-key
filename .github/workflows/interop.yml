@@ -1,0 +1,38 @@
+name: Interop
+# Live cross-language check: each package makes keys, hashes, codes, tokens,
+# JWTs (with fresh keys) and ciphertexts; the other package verifies them.
+on:
+  push:
+    branches: [main]
+    paths: ["python/**", "js/**", "spec/**", ".github/workflows/interop.yml"]
+  pull_request:
+    paths: ["python/**", "js/**", "spec/**", ".github/workflows/interop.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  interop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - run: python -m pip install -e "python[crypto]"
+      - run: npm ci && npm run build
+        working-directory: js
+      - name: JS makes, Python verifies
+        run: |
+          node js/test/interop.mjs make > "$RUNNER_TEMP/js.json"
+          python python/scripts/interop.py verify "$RUNNER_TEMP/js.json"
+      - name: Python makes, JS verifies
+        run: |
+          python python/scripts/interop.py make > "$RUNNER_TEMP/py.json"
+          node js/test/interop.mjs verify "$RUNNER_TEMP/py.json"

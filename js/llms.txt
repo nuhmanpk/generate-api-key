@@ -1,0 +1,81 @@
+# @nuhmanpk/generateapikey (npm) — guide for AI coding agents
+
+Zero-dependency TypeScript library for API keys and MFA on Web Crypto (Node 20+, Bun, Deno,
+Cloudflare Workers, Vercel Edge, browsers). Install: `npm i @nuhmanpk/generateapikey`. Wire-compatible
+with the Python package `generateapikey` (PyPI): keys, hashes, codes, tokens, JWTs and
+ciphertexts made in one language verify in the other. Same version number on npm and PyPI.
+
+Print this guide for the installed version: `npx @nuhmanpk/generateapikey --llms`.
+Full reference: https://github.com/nuhmanpk/generate-api-key/blob/main/docs/js.md
+Wire formats: https://github.com/nuhmanpk/generate-api-key/blob/main/spec/SPEC.md
+
+## Decide what to use
+
+| Need | Use |
+|---|---|
+| A random API key | `generateApiKey({ prefix: "sk", checksum: true })` (sync, returns string) |
+| A key that expires | `generateApiKey({ expiry: 60 })` → `ApiKey` (`.value`, `.expiresAt` unix seconds) |
+| Store a key | `await hashApiKey(key, pepper)`; never store the raw key |
+| Check a key | `await verifyApiKey(key, stored, pepper)` (constant-time) — never `===` |
+| Key + hash + hint in one step | `await issueApiKey({ prefix: "sk", pepper })` |
+| Rotate a key with a grace period | `await rotateApiKey({ graceMinutes: 1440, pepper })` |
+| Protect HTTP routes | `APIKeyAuth` + adapter: `@nuhmanpk/generateapikey/hono`, `/express`, `/fastify`, `/koa`, `/next`, `/web` |
+| Permissions | store `scopes` on the record; `requiredScopes` / `hasScope(granted, "read:users")` |
+| A deterministic key from secret + seed | `await deriveApiKey({ secret, seed })` |
+| Authenticator-app 2FA | `generateTotpSecret()`, `totpUri(...)`, `await findTotpStep(secret, code, { lastUsedStep })` |
+| Backup codes | `generateRecoveryCodes()`, `await hashRecoveryCode(c)`, `await verifyRecoveryCode(c, hashes)` |
+| Email/SMS code | `generateOtp()`, `await hashOtp(code)`, `await verifyOtp(code, hashed, expiresAt)` |
+| Brute-force protection | `new AttemptLimiter()`; call `hit(id)` BEFORE verifying. Shared: `RedisAttemptLimiter` |
+| Magic links / reset links | `await generateSignedToken(secret, data, { purpose, context })` / `verifySignedToken` |
+| Standard JWT | `await encodeJwt(claims, secret)` / `await decodeJwt(token, secret, { algorithms })` |
+| Encrypt TOTP secrets at rest | `const box = await SecretBox.create(key)`; `await box.encrypt(s, userId)` |
+| QR code for TOTP setup | `import { qrSvg } from "@nuhmanpk/generateapikey/qr"` |
+| Find leaked keys | `findKeys(text, "sk")`, `gitleaksRule("sk", "acme-key")` |
+
+## Rules
+
+1. Most functions that hash, sign or verify are **async** (Web Crypto). Always `await` them.
+   Sync: `generateApiKey`, `generateApiKeys`, `computeChecksum`, `verifyChecksum`, `entropyBits`,
+   `buildCharset`, `randomKey`, `generateTotpSecret`, `totpUri`, `hotpUri`, `generateRecoveryCodes`,
+   `normalizeRecoveryCode`, `generateOtp`, scopes, scanning, `AttemptLimiter`, `recordIsActive`,
+   `pathExcluded`, `keyHint`.
+2. Units match Python: `expiry` options are **minutes**; `expiresAt` and record `expires_at` are
+   **unix seconds** (not milliseconds).
+3. Store only hashes. Verify with `verify*` functions (constant-time). Never compare secrets with `===`.
+4. Short codes (OTP, TOTP, recovery) must be rate-limited: `limiter.hit(userId)` before verifying.
+5. Store the step from `findTotpStep` and pass it back as `lastUsedStep` (replay protection).
+6. Delete the hash returned by `verifyRecoveryCode` (single use).
+7. Encrypt TOTP secrets with `SecretBox`; pass the user id as `aad`.
+8. Keep `pepper`, token secrets and SecretBox keys in env / secret manager, never in the database.
+9. `decodeJwt` needs explicit `algorithms`; never mix HS* with RS*/ES*.
+10. Don't pass `secret`/`seed` to `generateApiKey`; use `deriveApiKey`.
+
+## Example: protect a Hono app on Cloudflare Workers
+
+```ts
+import { Hono } from "hono";
+import { APIKeyAuth, issueApiKey } from "@nuhmanpk/generateapikey";
+import { apiKey } from "@nuhmanpk/generateapikey/hono";
+
+const app = new Hono<{ Bindings: { PEPPER: string; DB: D1Database } }>();
+app.use("/api/*", (c, next) =>
+  apiKey(new APIKeyAuth({
+    lookup: (hashed) => c.env.DB.prepare("SELECT * FROM api_keys WHERE hashed = ?").bind(hashed).first(),
+    pepper: c.env.PEPPER,
+    prefix: "sk",
+    requireChecksum: true,
+  }))(c, next));
+app.get("/api/me", (c) => c.json({ id: c.get("apiKey").id }));
+```
+
+## Python names → JS names
+
+`generate_api_key` → `generateApiKey` (random) / `deriveApiKey` (secret+seed) ·
+`hash_api_key` → `hashApiKey` · `verify_api_key` → `verifyApiKey` · `issue_api_key` → `issueApiKey` ·
+`rotate_api_key` → `rotateApiKey` · `APIKeyAuth` → `APIKeyAuth` (`authenticate` is async) ·
+`find_totp_step` → `findTotpStep` · `verify_totp` → `verifyTotp` · `generate_recovery_codes` →
+`generateRecoveryCodes` · `generate_signed_token` → `generateSignedToken` · `encode_jwt` →
+`encodeJwt` · `decode_jwt_jwks` → `decodeJwtJwks` · `SecretBox(key)` → `await SecretBox.create(key)` ·
+`KeyStore(path)` → `new KeyStore(new SqlKeyStorage(driver))` (same table schema) ·
+`key_pattern` → `keyPattern` (same regex text) / `keyRegExp` (JS RegExp) ·
+`RedisAttemptLimiter(redis)` → `new RedisAttemptLimiter({ eval, get, del })` (shares counters).

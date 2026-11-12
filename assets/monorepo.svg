@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-label="One library, two languages: the PyPI package and the npm package both implement spec v1 and verify each other's keys, hashes, codes, tokens and JWTs">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="1" stop-color="#dfe6ef"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2633"/>
+      <stop offset="1" stop-color="#0b1118"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe08a"/>
+      <stop offset="0.5" stop-color="#f5b83d"/>
+      <stop offset="1" stop-color="#c98a12"/>
+    </linearGradient>
+    <linearGradient id="py" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3776ab"/>
+      <stop offset="1" stop-color="#2b5b84"/>
+    </linearGradient>
+    <linearGradient id="js" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3178c6"/>
+      <stop offset="1" stop-color="#235a97"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3fd0ff" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#3fd0ff" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#f5b83d"/>
+    </marker>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#2c3b4a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="560" fill="url(#bg)"/>
+
+  <text x="600" y="62" text-anchor="middle" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="34" font-weight="700" fill="#1b2633">One library, two languages, one wire format</text>
+  <text x="600" y="96" text-anchor="middle" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#4d6378">A key, hash, code, token or JWT made in one verifies in the other</text>
+
+  <!-- Python card -->
+  <g filter="url(#soft)">
+    <rect x="60" y="140" width="360" height="300" rx="22" fill="url(#card)"/>
+    <rect x="60" y="140" width="360" height="64" rx="22" fill="url(#py)"/>
+    <rect x="60" y="182" width="360" height="22" fill="url(#py)"/>
+  </g>
+  <text x="90" y="182" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#ffffff">Python · PyPI</text>
+  <text x="390" y="182" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" fill="#ffe08a">0.6.0</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" fill="#cfe7ff">
+    <text x="90" y="240"><tspan fill="#6b8299">$</tspan> pip install generateapikey</text>
+    <text x="90" y="278">hash_api_key(key, pepper)</text>
+    <text x="90" y="306">find_totp_step(secret, code)</text>
+    <text x="90" y="334">encode_jwt(claims, key, …)</text>
+  </g>
+  <g font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#8fa6bd">
+    <text x="90" y="378">FastAPI · Django · DRF · Flask · Starlette</text>
+    <text x="90" y="400">Litestar · Sanic · aiohttp · Quart · Falcon</text>
+    <text x="90" y="422">Python 3.9 – 3.14 · stdlib only</text>
+  </g>
+
+  <!-- JS card -->
+  <g filter="url(#soft)">
+    <rect x="780" y="140" width="360" height="300" rx="22" fill="url(#card)"/>
+    <rect x="780" y="140" width="360" height="64" rx="22" fill="url(#js)"/>
+    <rect x="780" y="182" width="360" height="22" fill="url(#js)"/>
+  </g>
+  <text x="810" y="182" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#ffffff">TypeScript · npm</text>
+  <text x="1110" y="182" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" fill="#ffe08a">0.6.0</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" fill="#cfe7ff">
+    <text x="810" y="240"><tspan fill="#6b8299">$</tspan> npm i @nuhmanpk/generateapikey</text>
+    <text x="810" y="278">await hashApiKey(key, pepper)</text>
+    <text x="810" y="306">await findTotpStep(secret, code)</text>
+    <text x="810" y="334">await encodeJwt(claims, key, …)</text>
+  </g>
+  <g font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#8fa6bd">
+    <text x="810" y="378">Hono · Express · Fastify · Koa · Next.js · fetch</text>
+    <text x="810" y="400">Node · Bun · Deno · Workers · Edge · browser</text>
+    <text x="810" y="422">Web Crypto only · zero dependencies</text>
+  </g>
+
+  <!-- Spec in the middle -->
+  <circle cx="600" cy="290" r="150" fill="url(#glow)"/>
+  <g filter="url(#soft)">
+    <rect x="500" y="215" width="200" height="150" rx="20" fill="#ffffff"/>
+  </g>
+  <rect x="500" y="215" width="200" height="8" rx="4" fill="url(#gold)"/>
+  <text x="600" y="262" text-anchor="middle" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1b2633">spec v1</text>
+  <text x="600" y="290" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#4d6378">SPEC.md</text>
+  <text x="600" y="310" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" fill="#4d6378">vectors.json</text>
+  <text x="600" y="342" text-anchor="middle" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#6b8299">generated from Python</text>
+
+  <!-- arrows -->
+  <path d="M428 262 C 455 262, 470 262, 492 262" stroke="#f5b83d" stroke-width="4" fill="none" marker-end="url(#arrow)"/>
+  <path d="M708 262 C 730 262, 745 262, 772 262" stroke="#f5b83d" stroke-width="4" fill="none" marker-end="url(#arrow)"/>
+  <path d="M772 322 C 745 322, 730 322, 708 322" stroke="#f5b83d" stroke-width="4" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+  <path d="M492 322 C 470 322, 455 322, 428 322" stroke="#f5b83d" stroke-width="4" fill="none" marker-end="url(#arrow)" opacity="0.6"/>
+
+  <!-- interop band -->
+  <g filter="url(#soft)">
+    <rect x="60" y="468" width="1080" height="58" rx="16" fill="#ffffff"/>
+  </g>
+  <g font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#2c3b4a" text-anchor="middle">
+    <text x="195" y="503">keys &amp; checksums</text>
+    <text x="370" y="503">key hashes</text>
+    <text x="525" y="503">TOTP / HOTP</text>
+    <text x="690" y="503">recovery &amp; OTP codes</text>
+    <text x="860" y="503">signed tokens · JWT</text>
+    <text x="1025" y="503">SecretBox</text>
+  </g>
+  <g fill="#f5b83d">
+    <circle cx="282" cy="497" r="3"/>
+    <circle cx="447" cy="497" r="3"/>
+    <circle cx="600" cy="497" r="3"/>
+    <circle cx="777" cy="497" r="3"/>
+    <circle cx="950" cy="497" r="3"/>
+  </g>
+</svg>
